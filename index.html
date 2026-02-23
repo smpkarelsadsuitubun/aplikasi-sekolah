@@ -2673,8 +2673,14 @@
             document.getElementById('menuDataSiswa').style.display = 'block';
             document.getElementById('menuQRCode').style.display = 'block';
         }
+		fetch("data.csv")
+  .then(response => response.text())
+  .then(data => {
+    console.log(data); // cek dulu di console
+  });
     </script>
 </body>
 
 </html>
+
 
