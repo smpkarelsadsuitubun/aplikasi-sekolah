@@ -366,7 +366,7 @@ table th,table td{padding:6px 5px;font-size:10.5px}
 <div><label class="fl">Nama PD</label><input type="text" id="eNama"></div>
 <div><label class="fl">NISN</label><input type="text" id="eNisn"></div>
 <div><label class="fl">NIK</label><input type="text" id="eNik"></div>
-<div><label class="fl">Kelas</label><select id="eKls"><option>VII-A</option><option>VII-B</option><option>VIII-A</option><option>VIII-B</option><option>IX-A</option><option>IX-B</option></select></div>
+<div><label class="fl">Kelas</label><select id="eKls"><option>VIIA</option><option>VIIB</option><option>VIIIA</option><option>VIIIB</option><option>IXA</option><option>IXB</option></select></div>
 <div><label class="fl">Jenis Kelamin</label><select id="eJK"><option>Laki-laki</option><option>Perempuan</option></select></div>
 <div><label class="fl">Satuan Pendidikan</label><select id="eSP"><option>SMP Negeri 1</option><option>SMP Negeri 2</option><option>SMP Negeri 3</option><option>MTs Nurul Huda</option></select></div>
 </div>
