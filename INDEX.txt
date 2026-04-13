@@ -3,162 +3,234 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistem STS - SMP Karel Sadsuitubun</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<title>SMP Karel Sadsuitubun - Sistem STS</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-:root{--pr:#0b3d6b;--pr2:#105da8;--pr3:#1a7fd4;--prl:#e6f2fb;--acc:#e8a308;--bg:#edf3fa;--card:#ffffff;--tx:#1e2d3d;--tx2:#6b7f95;--ok:#1a9a52;--no:#c93b3b;--wr:#d9960a;--sb:250px;--r:10px}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--tx);overflow-x:hidden}
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-thumb{background:var(--pr2);border-radius:4px}
-#loginPage{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,#061e36 0%,#0b3d6b 45%,#1a7fd4 100%);padding:20px;position:relative;overflow:hidden}
-#loginPage::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 80%,rgba(26,127,212,0.15),transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(232,163,8,0.08),transparent 50%)}
-.lc{background:rgba(255,255,255,0.97);border-radius:18px;padding:36px 32px;width:100%;max-width:400px;box-shadow:0 30px 80px rgba(0,0,0,0.35);position:relative;z-index:2;animation:up .5s ease}
-@keyframes up{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-.lc .lw{text-align:center;margin-bottom:18px}
-.lc .lw img{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--pr2);box-shadow:0 4px 12px rgba(11,61,107,0.2)}
-.lc h2{color:var(--pr);font-size:1.35rem;font-weight:700;text-align:center}
-.lc>p{color:var(--tx2);text-align:center;font-size:.82rem;margin:4px 0 22px}
-.fg{margin-bottom:15px;position:relative}
-.fg label{display:block;font-size:.78rem;font-weight:600;margin-bottom:5px}
-.fg input{width:100%;padding:11px 13px 11px 38px;border:2px solid #d4dde8;border-radius:9px;font-size:.88rem;font-family:inherit;transition:.25s;background:#f7fafd}
-.fg input:focus{outline:none;border-color:var(--pr3);background:#fff;box-shadow:0 0 0 3px rgba(26,127,212,0.1)}
-.fg i{position:absolute;left:13px;bottom:12px;color:var(--tx2);font-size:.85rem}
-.bl{width:100%;padding:12px;background:linear-gradient(135deg,var(--pr),var(--pr3));color:#fff;border:none;border-radius:9px;font-size:.95rem;font-weight:600;font-family:inherit;cursor:pointer;transition:.25s;letter-spacing:.3px}
-.bl:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(26,127,212,0.3)}
-.le{color:var(--no);font-size:.78rem;text-align:center;margin-top:8px;display:none;animation:sk .35s}
-@keyframes sk{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-.yl{margin-top:22px;text-align:center;position:relative;z-index:2}
-.yl a{color:rgba(255,255,255,.88);text-decoration:none;font-size:.8rem;display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:rgba(255,0,0,0.12);border:1px solid rgba(255,0,0,0.25);border-radius:28px;transition:.25s}
-.yl a:hover{background:rgba(255,0,0,0.25);color:#fff}
-.bf{position:absolute;border-radius:50%;background:rgba(255,255,255,0.04)}
-.bf:nth-child(1){width:280px;height:280px;top:-90px;right:-70px;animation:f1 9s ease-in-out infinite}
-.bf:nth-child(2){width:180px;height:180px;bottom:-50px;left:-50px;animation:f2 11s ease-in-out infinite}
-@keyframes f1{0%,100%{transform:translate(0,0)}50%{transform:translate(-25px,25px)}}
-@keyframes f2{0%,100%{transform:translate(0,0)}50%{transform:translate(18px,-18px)}}
-#mainApp{display:none;min-height:100vh}
-#sidebar{position:fixed;top:0;left:0;width:var(--sb);height:100vh;background:linear-gradient(180deg,#061e36 0%,#0b3d6b 100%);color:#fff;z-index:100;transition:transform .3s;overflow-y:auto;display:flex;flex-direction:column}
-.sh{padding:18px 18px 14px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.08)}
-.sh img{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.25);margin-bottom:6px}
-.sh h3{font-size:.88rem;font-weight:600}
-.sh small{font-size:.65rem;opacity:.6}
-.sn{flex:1;padding:12px 0}
-.ni{display:flex;align-items:center;gap:11px;padding:11px 20px;color:rgba(255,255,255,0.65);text-decoration:none;font-size:.84rem;font-weight:500;transition:.2s;cursor:pointer;border-left:3px solid transparent}
-.ni:hover{color:#fff;background:rgba(255,255,255,0.07)}
-.ni.act{color:#fff;background:rgba(255,255,255,0.1);border-left-color:var(--acc)}
-.ni i{width:18px;text-align:center;font-size:.9rem}
-.sf{padding:12px 20px;border-top:1px solid rgba(255,255,255,0.08)}
-.sf .ni{padding:9px 0;border-left:none}
-#content{margin-left:var(--sb);padding:22px;min-height:100vh;transition:margin .3s}
-.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:10px}
-.ph h2{font-size:1.3rem;font-weight:700;color:var(--pr)}
-.hb{display:none;background:none;border:none;color:var(--pr);font-size:1.4rem;cursor:pointer;padding:6px}
-.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-bottom:22px}
-.sc{background:var(--card);border-radius:var(--r);padding:18px;box-shadow:0 2px 10px rgba(0,0,0,0.05);display:flex;align-items:center;gap:14px;transition:.25s;position:relative;overflow:hidden}
-.sc:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.08)}
-.sc::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%}
-.sc.c1::before{background:var(--pr3)}.sc.c2::before{background:var(--ok)}.sc.c3::before{background:var(--acc)}.sc.c4::before{background:var(--no)}
-.si{width:46px;height:46px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#fff;flex-shrink:0}
-.sc.c1 .si{background:linear-gradient(135deg,#1a7fd4,#0b3d6b)}
-.sc.c2 .si{background:linear-gradient(135deg,#1a9a52,#27c96b)}
-.sc.c3 .si{background:linear-gradient(135deg,#e8a308,#d48a06)}
-.sc.c4 .si{background:linear-gradient(135deg,#c93b3b,#a82e2e)}
-.sv h4{font-size:1.5rem;font-weight:700;color:var(--pr);line-height:1}
-.sv p{font-size:.74rem;color:var(--tx2);margin-top:2px}
-.slg{margin-left:auto}
-.slg img{width:50px;height:50px;border-radius:9px;object-fit:cover;border:2px solid #e0e7ef}
-.dg{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.dc{background:var(--card);border-radius:var(--r);padding:20px;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
-.dc h3{font-size:.95rem;font-weight:600;color:var(--pr);margin-bottom:12px;display:flex;align-items:center;gap:7px}
-.dc h3 i{color:var(--pr3)}
-.at{font-size:.83rem;line-height:1.7;white-space:pre-line}
-.ji{width:100%;border-radius:7px;object-fit:contain;max-height:380px}
-.fw{grid-column:1/-1}
-.tw{background:var(--card);border-radius:var(--r);box-shadow:0 2px 10px rgba(0,0,0,0.05);overflow:hidden}
-.th{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-bottom:1px solid #edf3fa}
-.th h3{font-size:.95rem;font-weight:600;color:var(--pr)}
-.ts{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:.8rem}
-thead{background:var(--pr)}
-thead th{padding:10px 12px;color:#fff;font-weight:600;text-align:left;white-space:nowrap}
-tbody tr{border-bottom:1px solid #f0f4f8;transition:.15s}
-tbody tr:hover{background:var(--prl)}
-tbody td{padding:9px 12px;white-space:nowrap}
-tbody tr:nth-child(even){background:#f8fbfe}
-tbody tr:nth-child(even):hover{background:var(--prl)}
-.tabs{display:flex;gap:3px;flex-wrap:wrap;padding:10px 14px;background:var(--card);border-radius:var(--r) var(--r) 0 0;box-shadow:0 2px 6px rgba(0,0,0,0.03);overflow-x:auto}
-.tb{padding:8px 14px;border:2px solid #d4dde8;border-radius:7px;background:#f7fafd;color:var(--tx);font-size:.76rem;font-weight:500;font-family:inherit;cursor:pointer;transition:.2s;white-space:nowrap}
-.tb:hover{border-color:var(--pr3);color:var(--pr3)}
-.tb.act{background:var(--pr);color:#fff;border-color:var(--pr)}
-.fb{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#f7fafd;border-bottom:1px solid #edf3fa;flex-wrap:wrap}
-.fb select,.fb input{padding:7px 10px;border:2px solid #d4dde8;border-radius:7px;font-size:.8rem;font-family:inherit;background:#fff}
-.fb select:focus,.fb input:focus{outline:none;border-color:var(--pr3)}
-.fb input{flex:1;min-width:160px}
-.btn{padding:8px 16px;border:none;border-radius:7px;font-size:.8rem;font-weight:600;font-family:inherit;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:5px}
-.bp{background:var(--pr);color:#fff}.bp:hover{background:var(--pr2)}
-.bs{background:var(--ok);color:#fff}.bs:hover{background:#15803f}
-.bw{background:var(--acc);color:#fff}.bw:hover{background:#b88006}
-.bd{background:var(--no);color:#fff}.bd:hover{background:#a82e2e}
-.bsm{padding:6px 11px;font-size:.73rem}
-.bg{display:flex;gap:7px;flex-wrap:wrap}
-.stg{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
-.kc{background:var(--card);border-radius:var(--r);padding:22px;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
-.kc h3{font-size:.95rem;font-weight:600;color:var(--pr);margin-bottom:14px;display:flex;align-items:center;gap:7px}
-.kc h3 i{color:var(--pr3)}
-.kc img{max-width:180px;border-radius:9px;display:block;margin:0 auto 12px;border:2px solid #e0e7ef}
-.kc textarea{width:100%;padding:11px;border:2px solid #d4dde8;border-radius:9px;font-family:inherit;font-size:.83rem;resize:vertical;min-height:110px;transition:.25s}
-.kc textarea:focus{outline:none;border-color:var(--pr3)}
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(90px);padding:12px 24px;border-radius:9px;color:#fff;font-size:.85rem;font-weight:500;z-index:9999;opacity:0;transition:.35s;pointer-events:none;white-space:nowrap}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.ok{background:var(--ok)}.toast.no{background:var(--no)}.toast.info{background:var(--pr3)}
-.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:90}
-.ov.show{display:block}
-.sb{display:inline-block;padding:2px 9px;border-radius:16px;font-weight:600;font-size:.76rem}
-.sh1{background:#d1fae5;color:#065f46}.shm{background:#fef3c7;color:#92400e}.slo{background:#fee2e2;color:#991b1b}.sz{background:#e5e7eb;color:#6b7280}
-.fi{animation:fi .35s ease}
-@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:768px){
-#sidebar{transform:translateX(-100%)}#sidebar.open{transform:translateX(0)}
-#content{margin-left:0}.hb{display:block}
-.sg{grid-template-columns:1fr 1fr}.dg{grid-template-columns:1fr}.stg{grid-template-columns:1fr}
-.lc{padding:28px 20px}.ph h2{font-size:1.1rem}#content{padding:14px}
+:root{
+--primary:#0d47a1;--primary-m:#1565c0;--primary-l:#42a5f5;--accent:#00acc1;
+--bg:#e8f0fe;--card:#fff;--text:#0d1b3e;--muted:#5a6a85;--border:#c5d5ea;
+--success:#1b8a3d;--danger:#c62828;--warning:#e65100;
+--sidebar:#0a2e6e;--sidebar-h:#123d8a;--sidebar-t:#d6e8ff;
+--radius:10px;--shadow:0 2px 16px rgba(10,46,110,.07);
 }
-@media(max-width:480px){.sg{grid-template-columns:1fr}.sc{padding:14px}.sv h4{font-size:1.2rem}}
-@media(prefers-reduced-motion:reduce){*{animation-duration:0s!important;transition-duration:0s!important}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var(--bg);min-height:100vh;overflow-x:hidden}
+h1,h2,h3,h4{font-family:'Sora',sans-serif;font-weight:700;color:var(--primary)}
+/* ===== LOGIN ===== */
+#loginPage{min-height:100vh;display:flex;align-items:center;justify-content:center;
+background:linear-gradient(135deg,#0a2e6e 0%,#1565c0 50%,#0d47a1 100%);position:relative;overflow:hidden}
+.login-blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.18;animation:blobFloat 8s ease-in-out infinite}
+.login-blob:nth-child(1){width:320px;height:320px;background:#00acc1;top:-60px;left:-80px}
+.login-blob:nth-child(2){width:260px;height:260px;background:#42a5f5;bottom:-40px;right:-60px;animation-delay:3s}
+.login-blob:nth-child(3){width:200px;height:200px;background:#80deea;top:40%;left:60%;animation-delay:5s}
+@keyframes blobFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.05)}66%{transform:translate(-20px,15px) scale(.95)}}
+.login-card{background:rgba(255,255,255,.95);backdrop-filter:blur(20px);border-radius:18px;padding:36px 32px;width:92%;max-width:400px;box-shadow:0 16px 48px rgba(0,0,0,.25);position:relative;z-index:2}
+.login-card .logo-img{width:90px;height:90px;border-radius:14px;object-fit:contain;margin:0 auto 12px;display:block;background:#f0f5ff}
+.login-card h2{text-align:center;font-size:1.15rem;margin-bottom:4px}
+.login-card .sub{text-align:center;color:var(--muted);font-size:.82rem;margin-bottom:22px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:.78rem;font-weight:600;margin-bottom:5px;color:var(--primary)}
+.form-group input{width:100%;padding:10px 12px 10px 38px;border:1.5px solid var(--border);border-radius:8px;font-size:.9rem;font-family:inherit;transition:.2s;background:#f8faff}
+.form-group input:focus{outline:none;border-color:var(--primary-l);box-shadow:0 0 0 3px rgba(66,165,245,.15)}
+.form-group .input-wrap{position:relative}
+.form-group .input-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.85rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border:none;border-radius:8px;font-size:.85rem;font-weight:600;font-family:inherit;cursor:pointer;transition:.2s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-m)}
+.btn-success{background:var(--success);color:#fff}
+.btn-success:hover{background:#15732f}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#a11b1b}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--primary)}
+.btn-outline:hover{background:var(--bg)}
+.btn-sm{padding:6px 14px;font-size:.78rem}
+.btn-full{width:100%}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.login-btn{width:100%;padding:12px;font-size:.95rem;margin-top:6px;border-radius:10px}
+.yt-link{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:20px;padding:10px;background:#ff0000;color:#fff;border-radius:8px;text-decoration:none;font-size:.78rem;font-weight:600;transition:.2s}
+.yt-link:hover{background:#cc0000;transform:translateY(-1px)}
+.login-error{background:#fdecea;color:var(--danger);padding:8px 12px;border-radius:6px;font-size:.8rem;margin-bottom:12px;display:none}
+/* ===== MAIN APP ===== */
+#mainApp{display:none;min-height:100vh}
+.sidebar{position:fixed;top:0;left:0;width:250px;height:100vh;background:var(--sidebar);color:var(--sidebar-t);z-index:100;overflow-y:auto;transition:transform .3s;display:flex;flex-direction:column}
+.sidebar-header{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px}
+.sidebar-header img{width:38px;height:38px;border-radius:8px;object-fit:contain;background:#fff}
+.sidebar-header .app-title{font-family:'Sora';font-size:.85rem;font-weight:700;line-height:1.2}
+.sidebar-header .app-sub{font-size:.65rem;opacity:.7}
+.sidebar-nav{flex:1;padding:10px 0}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;font-size:.82rem;cursor:pointer;transition:.15s;border-left:3px solid transparent;color:var(--sidebar-t);text-decoration:none}
+.nav-item:hover{background:var(--sidebar-h);border-left-color:var(--primary-l)}
+.nav-item.active{background:var(--sidebar-h);border-left-color:var(--accent);color:#fff;font-weight:600}
+.nav-item i{width:18px;text-align:center;font-size:.9rem}
+.nav-sub{padding-left:18px}
+.nav-sub .nav-item{padding:8px 18px 8px 46px;font-size:.78rem;border-left:none}
+.nav-sub .nav-item.active{background:rgba(0,172,193,.15);color:#fff;border-left:none}
+.nav-sub-toggle{display:flex;align-items:center;gap:10px;padding:10px 18px;font-size:.82rem;cursor:pointer;transition:.15s;border-left:3px solid transparent;color:var(--sidebar-t)}
+.nav-sub-toggle:hover{background:var(--sidebar-h)}
+.nav-sub-toggle.active{border-left-color:var(--accent);color:#fff;font-weight:600}
+.nav-sub-toggle i.chevron{margin-left:auto;transition:transform .25s;font-size:.7rem}
+.nav-sub-toggle.open i.chevron{transform:rotate(90deg)}
+.nav-sub{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.nav-sub.open{max-height:600px}
+.sidebar-footer{padding:14px 16px;border-top:1px solid rgba(255,255,255,.08)}
+.sidebar-footer .nav-item{padding:8px 0}
+/* Top bar */
+.topbar{position:fixed;top:0;left:250px;right:0;height:56px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:90;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.hamburger{display:none;background:none;border:none;font-size:1.2rem;color:var(--primary);cursor:pointer;padding:4px}
+.topbar-title{font-family:'Sora';font-size:.95rem;font-weight:700;color:var(--primary)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-right .user-badge{font-size:.75rem;color:var(--muted);background:var(--bg);padding:4px 10px;border-radius:6px}
+.topbar-right .btn-logout{font-size:.78rem}
+/* Content */
+.content{margin-left:250px;margin-top:56px;padding:24px;min-height:calc(100vh - 56px)}
+.page{display:none;animation:fadeUp .3s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+/* Cards */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:18px;border:1px solid rgba(197,213,234,.4)}
+.card-title{font-size:.9rem;margin-bottom:14px;display:flex;align-items:center;gap:8px;color:var(--primary)}
+.card-title i{color:var(--primary-l)}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:18px}
+.stat-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;display:flex;align-items:center;gap:14px;border:1px solid rgba(197,213,234,.4);position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:0;right:0;width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,rgba(66,165,245,.08),transparent);transform:translate(20px,-20px)}
+.stat-icon{width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.stat-icon.blue{background:linear-gradient(135deg,#e3f2fd,#bbdefb);color:var(--primary)}
+.stat-icon.teal{background:linear-gradient(135deg,#e0f7fa,#b2ebf2);color:var(--accent)}
+.stat-icon.green{background:linear-gradient(135deg,#e8f5e9,#c8e6c9);color:var(--success)}
+.stat-info .stat-label{font-size:.72rem;color:var(--muted);font-weight:500}
+.stat-info .stat-value{font-family:'Sora';font-size:1.5rem;font-weight:800;color:var(--primary);line-height:1.2}
+.stat-logo{width:60px;height:60px;border-radius:10px;object-fit:contain;margin-left:auto;flex-shrink:0;background:#f5f8ff}
+/* Pengumuman */
+.pengumuman-box{background:linear-gradient(135deg,#e3f2fd,#fff);border-left:4px solid var(--primary-l);border-radius:0 var(--radius) var(--radius) 0;padding:16px 18px;margin-bottom:16px}
+.pengumuman-box h4{font-size:.85rem;margin-bottom:6px;color:var(--primary)}
+.pengumuman-box p{font-size:.82rem;color:var(--text);line-height:1.6}
+.jadwal-img{max-width:100%;border-radius:8px;margin-top:10px;box-shadow:var(--shadow)}
+/* Tables */
+.table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+thead{background:var(--primary);color:#fff}
+th{padding:10px 12px;text-align:left;font-weight:600;white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid #eef2f8}
+tbody tr:nth-child(even){background:#f5f8ff}
+tbody tr:hover{background:#e3f0ff}
+.score-high{color:var(--success);font-weight:700}
+.score-mid{color:var(--warning);font-weight:600}
+.score-low{color:var(--danger);font-weight:700}
+/* Search */
+.search-bar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.search-input{flex:1;min-width:200px;padding:9px 12px 9px 36px;border:1.5px solid var(--border);border-radius:8px;font-size:.83rem;font-family:inherit;background:#fff;position:relative}
+.search-wrap{position:relative;flex:1;min-width:200px}
+.search-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.8rem}
+.search-wrap input{width:100%;padding:9px 12px 9px 36px;border:1.5px solid var(--border);border-radius:8px;font-size:.83rem;font-family:inherit;background:#fff}
+.search-wrap input:focus{outline:none;border-color:var(--primary-l);box-shadow:0 0 0 3px rgba(66,165,245,.12)}
+/* Settings */
+.settings-logo{width:120px;height:120px;border-radius:14px;object-fit:contain;background:#f5f8ff;border:2px solid var(--border);margin-bottom:14px}
+.settings-section{margin-bottom:22px}
+.settings-section label{display:block;font-size:.78rem;font-weight:600;margin-bottom:6px;color:var(--primary)}
+.settings-section textarea{width:100%;min-height:100px;padding:10px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:.83rem;resize:vertical}
+.settings-section textarea:focus{outline:none;border-color:var(--primary-l)}
+.btn-group{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+/* Toast */
+.toast-container{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{padding:12px 18px;border-radius:8px;font-size:.82rem;font-weight:500;color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.15);animation:toastIn .3s ease;display:flex;align-items:center;gap:8px;max-width:340px}
+.toast.success{background:#1b8a3d}
+.toast.error{background:#c62828}
+.toast.info{background:var(--primary)}
+@keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+/* Overlay */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:95}
+/* Responsive */
+@media(max-width:768px){
+.sidebar{transform:translateX(-100%)}
+.sidebar.open{transform:translateX(0)}
+.sidebar-overlay.open{display:block}
+.topbar{left:0}
+.content{margin-left:0;padding:16px}
+.hamburger{display:block}
+.stat-grid{grid-template-columns:1fr}
+.search-bar{flex-direction:column}
+.search-wrap{min-width:100%}
+.btn-group{flex-direction:column}
+.btn-group .btn{width:100%}
+.login-card{padding:28px 22px}
+}
+@media(min-width:769px) and (max-width:1024px){
+.sidebar{width:220px}
+.topbar{left:220px}
+.content{margin-left:220px}
+}
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#b0c4de;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#8aa8c8}
+/* Print */
+@media print{.sidebar,.topbar,.hamburger,.btn{display:none!important}.content{margin:0;padding:10px}}
+.hidden{display:none!important}
 </style>
 </head>
 <body>
+
+<!-- Halaman Login -->
 <div id="loginPage">
-<div class="bf"></div><div class="bf"></div>
-<div class="lc">
-<div class="lw"><img src="https://drive.google.com/thumbnail?id=18-fVQ1HqVhduTzsYSxFj6PqJop4ifDru&sz=w200" alt="Logo" onerror="this.onerror=null;this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%230b3d6b%22 width=%22100%22 height=%22100%22 rx=%2250%22/><text x=%2250%22 y=%2260%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2232%22 font-weight=%22bold%22>SK</text></svg>'"></div>
-<h2>Sistem STS</h2><p>SMP Karel Sadsuitubun</p>
-<div class="fg"><label>Username</label><i class="fas fa-user"></i><input type="text" id="lu" placeholder="Masukkan username" autocomplete="off"></div>
-<div class="fg"><label>Password</label><i class="fas fa-lock"></i><input type="password" id="lp" placeholder="Masukkan password"></div>
-<button class="bl" onclick="doLogin()">Masuk</button>
-<div class="le" id="ler">Username atau password salah!</div>
+  <div class="login-blob"></div><div class="login-blob"></div><div class="login-blob"></div>
+  <div class="login-card">
+    <img class="logo-img" src="https://lh3.googleusercontent.com/d/18-fVQ1HqVhduTzsYSxFj6PqJop4ifDru" alt="Logo" onerror="this.style.background='#dde8f8';this.alt='Logo SMP Karel Sadsuitubun'">
+    <h2>SMP Karel Sadsuitubun</h2>
+    <p class="sub">Sistem Penilaian STS</p>
+    <div class="login-error" id="loginError"></div>
+    <div class="form-group">
+      <label>Username</label>
+      <div class="input-wrap"><i class="fas fa-user"></i><input type="text" id="loginUser" placeholder="Masukkan username" autocomplete="off"></div>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <div class="input-wrap"><i class="fas fa-lock"></i><input type="password" id="loginPass" placeholder="Masukkan password"></div>
+    </div>
+    <button class="btn btn-primary login-btn" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Masuk</button>
+    <a class="yt-link" href="https://www.youtube.com/@chanelsmpkarelsadsuitubun1605" target="_blank" rel="noopener">
+      <i class="fab fa-youtube"></i> YouTube Channel SMP Karel Sadsuitubun
+    </a>
+  </div>
 </div>
-<div class="yl"><a href="https://www.youtube.com/@chanelsmpkarelsadsuitubun1605" target="_blank" rel="noopener"><i class="fab fa-youtube" style="color:#ff4444;font-size:1rem"></i>Subscribe YouTube Channel SMP Karel Sadsuitubun</a></div>
-</div>
+
+<!-- Aplikasi Utama -->
 <div id="mainApp">
-<div class="ov" id="ov" onclick="csb()"></div>
-<aside id="sidebar">
-<div class="sh"><img src="https://drive.google.com/thumbnail?id=18-fVQ1HqVhduTzsYSxFj6PqJop4ifDru&sz=w200" alt="Logo" onerror="this.onerror=null;this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%230b3d6b%22 width=%22100%22 height=%22100%22 rx=%2250%22/><text x=%2250%22 y=%2260%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2232%22 font-weight=%22bold%22>SK</text></svg>'"><h3>SMP Karel Sadsuitubun</h3><small>Sistem STS Online</small></div>
-<nav class="sn" id="snav"></nav>
-<div class="sf"><div class="ni" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i><span>Keluar</span></div></div>
-</aside>
-<main id="content">
-<div class="ph"><div style="display:flex;align-items:center;gap:10px"><button class="hb" onclick="tsb()"><i class="fas fa-bars"></i></button><h2 id="pt">Dashboard</h2></div><div id="pa"></div></div>
-<div id="pc"></div>
-</main>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <img src="https://lh3.googleusercontent.com/d/18-fVQ1HqVhduTzsYSxFj6PqJop4ifDru" alt="Logo" onerror="this.style.background='#dde8f8'">
+      <div><div class="app-title">SMP Karel Sadsuitubun</div><div class="app-sub">Sistem Penilaian STS</div></div>
+    </div>
+    <nav class="sidebar-nav" id="sidebarNav"></nav>
+    <div class="sidebar-footer">
+      <div class="nav-item" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Keluar</div>
+    </div>
+  </aside>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+      <span class="topbar-title" id="topbarTitle">Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <span class="user-badge" id="userBadge"></span>
+      <button class="btn btn-outline btn-sm btn-logout" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Keluar</button>
+    </div>
+  </header>
+  <main class="content" id="contentArea"></main>
 </div>
-<div class="toast" id="toast"></div>
-<input type="file" id="fi1" accept=".csv" style="display:none">
-<input type="file" id="fi2" accept=".json" style="display:none">
+
+<!-- Toast -->
+<div class="toast-container" id="toastContainer"></div>
+
 <script>
-// === DATA SISWA (122 PD) ===
-const RS=`KS7A0020001|Agustina Martha Jalnuhubun
+/* ===================== DATA ===================== */
+// Master semua siswa (122) — digunakan untuk mata pelajaran dengan nilai 100
+const M=`KS7A0020001|Agustina Martha Jalnuhubun
 KS7A0020002|Alexa Sherryl Jabar
 KS7A0020003|Billyand Noah Putra Gaga
 KS7A0020004|Apolinaris Kelanit
@@ -181,8 +253,8 @@ KS7A0020020|Oktovianus Jamrevav
 KS7A0020021|Reza Dwi Eirlangga Jamlean
 KS7A0020022|Steven Arnold Laumualy
 KS7A0020023|Yohana T Resubun
-KS7B0020001|Agnes Adriana Tawain
-KS7B0020002|Allmendo Xavi Remetwa
+KS7B0020001|Agnes Adriana Tawain.
+KS7B0020002|Allmendo Xavi Remetwa.
 KS7B0020003|Alexander Simon Vatubun
 KS7B0020004|Aroby Tamher
 KS7B0020005|Aprilia Lidwina Welikin
@@ -279,14 +351,10 @@ KS9B0020016|SANDRA JEKLIN FARYO
 KS9B0020017|YOHANIS MESI EFRUAN
 KS9B0020018|YOHANIS MARVEL JAMREVAV
 KS9B0020019|WILHELMUS RAHALOB
-KS9B0020020|ZULKIFLI RAHAKBAUW`;
+KS9B0020020|ZULKIFLI RAHAKBAUW`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim()]});
 
-const AS=RS.trim().split('\n').map((l,i)=>{const p=l.split('|');return{n:i+1,u:p[0].trim(),nm:p[1].trim()};});
-function gk(u){return u.substring(2,4);}
-function gp(u){return u.replace('KS','').replace('002','02');}
-
-// === BAHASA INDONESIA (103 data) ===
-const RB=`KS7A0020002|Alexa Sherryl Jabar|84
+// Bahasa Indonesia (103 siswa)
+const BI=`KS7A0020002|Alexa Sherryl Jabar|84
 KS7A0020003|Billyand Noah Putra Gaga|82
 KS7A0020004|Apolinaris Kelanit|76
 KS7A0020005|Aprilia Ela Sirwutubun|78
@@ -305,8 +373,8 @@ KS7A0020019|Menci Elsina Fantri Karatem|63
 KS7A0020020|Oktovianus Jamrevav|46
 KS7A0020022|Steven Arnold Laumualy|53
 KS7A0020023|Yohana T Resubun|80
-KS7B0020001|Agnes Adriana Tawain|78
-KS7B0020002|Allmendo Xavi Remetwa|80
+KS7B0020001|Agnes Adriana Tawain.|78
+KS7B0020002|Allmendo Xavi Remetwa.|80
 KS7B0020004|Aroby Tamher|61
 KS7B0020005|Aprilia Lidwina Welikin|55
 KS7B0020007|Chaylen Manis Koedoeboen|77
@@ -388,11 +456,10 @@ KS9B0020014|RONI ANGGARA RAWULUNUBUN|82
 KS9B0020015|RAHEL M TARANTEIN|77
 KS9B0020016|SANDRA JEKLIN FARYO|62
 KS9B0020018|YOHANIS MARVEL JAMREVAV|28
-KS9B0020020|ZULKIFLI RAHAKBAUW|47`;
-const BD=RB.trim().split('\n').map((l,i)=>{const p=l.split('|');return{n:i+1,u:p[0].trim(),nm:p[1].trim(),s:+p[2]};});
+KS9B0020020|ZULKIFLI RAHAKBAUW|47`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
 
-// === AGAMA KATOLIK (50 data - termasuk Kelas 9) ===
-const RK=`KS7A0020004|Apolinaris Kelanit|85
+// Agama Katolik (50 siswa)
+const AK=`KS7A0020004|Apolinaris Kelanit|85
 KS7A0020005|Aprilia Ela Sirwutubun|80
 KS7A0020011|Gracia Viona Yanyaan|48
 KS7A0020015|Maria Ayu Paisa|69
@@ -400,7 +467,7 @@ KS7A0020017|Maria Theresia Rumangun|91
 KS7A0020018|Marlina Ingke Balriyanan|96
 KS7A0020020|Oktovianus Jamrevav|37
 KS7A0020023|Yohana T Resubun|92
-KS7B0020002|Allmendo Xavi Remetwa|86
+KS7B0020002|Allmendo Xavi Remetwa.|86
 KS7B0020003|Alexander Simon Vatubun|28
 KS7B0020005|Aprilia Lidwina Welikin|84
 KS7B0020010|Julius Marzelino Fadirubun|69
@@ -441,149 +508,716 @@ KS9B0020008|KRISTINA ANGRENI WELERUBUN|44
 KS9B0020012|MARIA BIN METURAN|66
 KS9B0020014|RONI ANGGARA RAWULUNUBUN|62
 KS9B0020016|SANDRA JEKLIN FARYO|41
-KS9B0020018|YOHANIS MARVEL JAMREVAV|31`;
-const AK=RK.trim().split('\n').map((l,i)=>{const p=l.split('|');return{n:i+1,u:p[0].trim(),nm:p[1].trim(),s:+p[2]};});
+KS9B0020018|YOHANIS MARVEL JAMREVAV|31`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
 
-// === DAFTAR MAPEL ===
-const MJ=[
-{id:'bindo',nm:'Bahasa Indonesia',d:BD,z:false},
-{id:'agamakat',nm:'Agama Katolik',d:AK,z:false},
-{id:'bing',nm:'Bahasa Inggris',d:null,z:true},
-{id:'pkn',nm:'PKn',d:null,z:true},
-{id:'ips',nm:'IPS',d:null,z:true},
-{id:'agamaislam',nm:'Agama Islam',d:null,z:true},
-{id:'mat',nm:'Matematika',d:null,z:true},
-{id:'agamaprot',nm:'Agama Protestan',d:null,z:true},
-{id:'pjok',nm:'PJOK',d:null,z:true},
-{id:'prakarya',nm:'Prakarya',d:null,z:true},
-{id:'tik',nm:'TIK',d:null,z:true}
+// Bahasa Inggris (103 siswa)
+const BG=`KS7A0020002|Alexa Sherryl Jabar|0
+KS7A0020003|Billyand Noah Putra Gaga|0
+KS7A0020004|Apolinaris Kelanit|0
+KS7A0020005|Aprilia Ela Sirwutubun|0
+KS7A0020006|Arlinda Metubun|0
+KS7A0020007|Bois Alfa Ngutra|0
+KS7A0020008|Dewi Putri Madubun|0
+KS7A0020009|Elagren Marlatu Lukas Madubun|0
+KS7A0020010|Fillano Pedrosa Masbaitubun|0
+KS7A0020011|Gracia Viona Yanyaan|0
+KS7A0020012|Johanes Obet Bertkat|0
+KS7A0020013|Jonathan Alvaro Moriolkosu|0
+KS7A0020015|Maria Ayu Paisa|0
+KS7A0020017|Maria Theresia Rumangun|0
+KS7A0020018|Marlina Ingke Balriyanan|0
+KS7A0020019|Menci Elsina Fantri Karatem|0
+KS7A0020020|Oktovianus Jamrevav|0
+KS7A0020022|Steven Arnold Laumualy|0
+KS7A0020023|Yohana T Resubun|0
+KS7B0020001|Agnes Adriana Tawain.|0
+KS7B0020002|Allmendo Xavi Remetwa.|0
+KS7B0020004|Aroby Tamher|0
+KS7B0020005|Aprilia Lidwina Welikin|0
+KS7B0020007|Chaylen Manis Koedoeboen|0
+KS7B0020008|Firman Tanarubun|0
+KS7B0020009|Herlina Abarua|0
+KS7B0020010|Julius Marzelino Fadirubun|0
+KS7B0020011|Jumadi Tamher|0
+KS7B0020013|Mintje Glorya Balubun|0
+KS7B0020014|Margaretha Futubun|0
+KS7B0020015|Mikha Desire Rukait|0
+KS7B0020016|Mawar Sharon Kirwelakubun|0
+KS7B0020017|Nahla Abidin Rahakratat|0
+KS7B0020018|Penina Rumangun|0
+KS7B0020019|Rafail Rengur|0
+KS7B0020020|Udeta Insoraki Rumyaan|0
+KS7B0020021|Yosep L Takerubun|0
+KS7B0020022|Maria A. Heatubun|0
+KS8A0020001|Alinda Ode|0
+KS8A0020002|Andreas Balubun|0
+KS8A0020003|Benedicta Petra Akbar|0
+KS8A0020004|Carolus B. Varis Wemaf|0
+KS8A0020005|Everets Jiffy Gattu|0
+KS8A0020009|Yoseph Erlangga Lamere|0
+KS8A0020010|Klementina Fernatyanan|0
+KS8A0020011|Mediana Aziera Jeujanan|0
+KS8A0020012|Rahmatia Bugis|0
+KS8A0020013|Reinal Moriolkosu|0
+KS8A0020014|Shalmon Antony Rahangmetan|0
+KS8A0020015|Vinsensius Edoardus Balubun|0
+KS8A0020016|Welhelmus Zyerzeven Ngarbingan|0
+KS8A0020018|Harita F. Laritmas|0
+KS8A0020020|Revandi Mukujei|0
+KS8B0020001|adriana theresia rahabav|0
+KS8B0020002|Christ Noel Desandro Emyu Souhoka|0
+KS8B0020003|Dewanti Sari Jamlean|0
+KS8B0020004|Fabiano B. S. Janjaan|0
+KS8B0020005|Gabriella Ernesta K. Kanarubun|0
+KS8B0020006|Gregorius Higuen Balubun|0
+KS8B0020007|Johanis Charles Woersok|0
+KS8B0020008|Maria Gratia Maturbongs|0
+KS8B0020009|Michael Joseph Masbaitubun|0
+KS8B0020010|Oksen Petrus Letsoin|0
+KS8B0020011|Paulina Chelsie Renwarin|0
+KS8B0020012|Restha Jenifer Rahanra|0
+KS8B0020014|FILIO EMANUEL FAR-FAR|0
+KS8B0020015|SYANE SELFI RAHANGMETAN|0
+KS8B0020016|MARIA STEFANI ATBAR|0
+KS8B0020018|Marwan R. Rahayaan|0
+KS9A0020001|ADRIANUS RAHANAU|0
+KS9A0020002|ADRIEL CALVINO RENWARIN|0
+KS9A0020003|AMOS RISAL OILIRA|0
+KS9A0020004|DIANA HERMINA HUAWAE|0
+KS9A0020005|VIRGYLIUS M.Y. LEFTUNGUN|0
+KS9A0020006|GIDION LEFTA|0
+KS9A0020007|INTAN RAHAKBAUW|0
+KS9A0020008|KEANO MACKENZIE RAHAJAAN|0
+KS9A0020009|LEONTINA JEUJANAN|0
+KS9A0020010|MARCELINO ALDO RENYAAN|0
+KS9A0020011|MARIA MUTIARA WARAT|0
+KS9A0020012|MELATI AUREL ROSYADI|0
+KS9A0020013|MICHAELA P. D. TAPOTUBUN|0
+KS9A0020014|NILAM MARSDA WABULA|0
+KS9A0020016|ROSNATA PUSPITA RENWARIN|0
+KS9A0020017|WELHELMUS RUMANGUN|0
+KS9A0020018|WIDY CLEANDRA AZAZYA JABAR|0
+KS9A0020019|WILIN NOTANUBUN|0
+KS9A0020020|LANA RIECEL LABOBAR|0
+KS9B0020001|ANDREAS LORENZO TAKERUBUN|0
+KS9B0020002|ALFONSINA OHOIULUN|0
+KS9B0020004|BERNADETA SIAHAYA|0
+KS9B0020005|DINDA PELANGI RENHORAN|0
+KS9B0020006|INTAN MASAHIDA|0
+KS9B0020008|KRISTINA ANGRENI WELERUBUN|0
+KS9B0020010|MARTHA MELSASAIL|0
+KS9B0020011|MUSA EFRUAN|0
+KS9B0020012|MARIA BIN METURAN|0
+KS9B0020013|NADYA HOEKOEBOEN|0
+KS9B0020014|RONI ANGGARA RAWULUNUBUN|0
+KS9B0020015|RAHEL M TARANTEIN|0
+KS9B0020016|SANDRA JEKLIN FARYO|0
+KS9B0020018|YOHANIS MARVEL JAMREVAV|0
+KS9B0020020|ZULKIFLI RAHAKBAUW|0`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
+
+
+// PKn (103 siswa)
+const PK=`KS7A0020002|Alexa Sherryl Jabar|0
+KS7A0020003|Billyand Noah Putra Gaga|0
+KS7A0020004|Apolinaris Kelanit|0
+KS7A0020005|Aprilia Ela Sirwutubun|0
+KS7A0020006|Arlinda Metubun|0
+KS7A0020007|Bois Alfa Ngutra|0
+KS7A0020008|Dewi Putri Madubun|0
+KS7A0020009|Elagren Marlatu Lukas Madubun|0
+KS7A0020010|Fillano Pedrosa Masbaitubun|0
+KS7A0020011|Gracia Viona Yanyaan|0
+KS7A0020012|Johanes Obet Bertkat|0
+KS7A0020013|Jonathan Alvaro Moriolkosu|0
+KS7A0020015|Maria Ayu Paisa|0
+KS7A0020017|Maria Theresia Rumangun|0
+KS7A0020018|Marlina Ingke Balriyanan|0
+KS7A0020019|Menci Elsina Fantri Karatem|0
+KS7A0020020|Oktovianus Jamrevav|0
+KS7A0020022|Steven Arnold Laumualy|0
+KS7A0020023|Yohana T Resubun|0
+KS7B0020001|Agnes Adriana Tawain.|0
+KS7B0020002|Allmendo Xavi Remetwa.|0
+KS7B0020004|Aroby Tamher|0
+KS7B0020005|Aprilia Lidwina Welikin|0
+KS7B0020007|Chaylen Manis Koedoeboen|0
+KS7B0020008|Firman Tanarubun|0
+KS7B0020009|Herlina Abarua|0
+KS7B0020010|Julius Marzelino Fadirubun|0
+KS7B0020011|Jumadi Tamher|0
+KS7B0020013|Mintje Glorya Balubun|0
+KS7B0020014|Margaretha Futubun|0
+KS7B0020015|Mikha Desire Rukait|0
+KS7B0020016|Mawar Sharon Kirwelakubun|0
+KS7B0020017|Nahla Abidin Rahakratat|0
+KS7B0020018|Penina Rumangun|0
+KS7B0020019|Rafail Rengur|0
+KS7B0020020|Udeta Insoraki Rumyaan|0
+KS7B0020021|Yosep L Takerubun|0
+KS7B0020022|Maria A. Heatubun|0
+KS8A0020001|Alinda Ode|0
+KS8A0020002|Andreas Balubun|0
+KS8A0020003|Benedicta Petra Akbar|0
+KS8A0020004|Carolus B. Varis Wemaf|0
+KS8A0020005|Everets Jiffy Gattu|0
+KS8A0020009|Yoseph Erlangga Lamere|0
+KS8A0020010|Klementina Fernatyanan|0
+KS8A0020011|Mediana Aziera Jeujanan|0
+KS8A0020012|Rahmatia Bugis|0
+KS8A0020013|Reinal Moriolkosu|0
+KS8A0020014|Shalmon Antony Rahangmetan|0
+KS8A0020015|Vinsensius Edoardus Balubun|0
+KS8A0020016|Welhelmus Zyerzeven Ngarbingan|0
+KS8A0020018|Harita F. Laritmas|0
+KS8A0020020|Revandi Mukujei|0
+KS8B0020001|adriana theresia rahabav|0
+KS8B0020002|Christ Noel Desandro Emyu Souhoka|0
+KS8B0020003|Dewanti Sari Jamlean|0
+KS8B0020004|Fabiano B. S. Janjaan|0
+KS8B0020005|Gabriella Ernesta K. Kanarubun|0
+KS8B0020006|Gregorius Higuen Balubun|0
+KS8B0020007|Johanis Charles Woersok|0
+KS8B0020008|Maria Gratia Maturbongs|0
+KS8B0020009|Michael Joseph Masbaitubun|0
+KS8B0020010|Oksen Petrus Letsoin|0
+KS8B0020011|Paulina Chelsie Renwarin|0
+KS8B0020012|Restha Jenifer Rahanra|0
+KS8B0020014|FILIO EMANUEL FAR-FAR|0
+KS8B0020015|SYANE SELFI RAHANGMETAN|0
+KS8B0020016|MARIA STEFANI ATBAR|0
+KS8B0020018|Marwan R. Rahayaan|0
+KS9A0020001|ADRIANUS RAHANAU|0
+KS9A0020002|ADRIEL CALVINO RENWARIN|0
+KS9A0020003|AMOS RISAL OILIRA|0
+KS9A0020004|DIANA HERMINA HUAWAE|0
+KS9A0020005|VIRGYLIUS M.Y. LEFTUNGUN|0
+KS9A0020006|GIDION LEFTA|0
+KS9A0020007|INTAN RAHAKBAUW|0
+KS9A0020008|KEANO MACKENZIE RAHAJAAN|0
+KS9A0020009|LEONTINA JEUJANAN|0
+KS9A0020010|MARCELINO ALDO RENYAAN|0
+KS9A0020011|MARIA MUTIARA WARAT|0
+KS9A0020012|MELATI AUREL ROSYADI|0
+KS9A0020013|MICHAELA P. D. TAPOTUBUN|0
+KS9A0020014|NILAM MARSDA WABULA|0
+KS9A0020016|ROSNATA PUSPITA RENWARIN|0
+KS9A0020017|WELHELMUS RUMANGUN|0
+KS9A0020018|WIDY CLEANDRA AZAZYA JABAR|0
+KS9A0020019|WILIN NOTANUBUN|0
+KS9A0020020|LANA RIECEL LABOBAR|0
+KS9B0020001|ANDREAS LORENZO TAKERUBUN|0
+KS9B0020002|ALFONSINA OHOIULUN|0
+KS9B0020004|BERNADETA SIAHAYA|0
+KS9B0020005|DINDA PELANGI RENHORAN|0
+KS9B0020006|INTAN MASAHIDA|0
+KS9B0020008|KRISTINA ANGRENI WELERUBUN|0
+KS9B0020010|MARTHA MELSASAIL|0
+KS9B0020011|MUSA EFRUAN|0
+KS9B0020012|MARIA BIN METURAN|0
+KS9B0020013|NADYA HOEKOEBOEN|0
+KS9B0020014|RONI ANGGARA RAWULUNUBUN|0
+KS9B0020015|RAHEL M TARANTEIN|0
+KS9B0020016|SANDRA JEKLIN FARYO|0
+KS9B0020018|YOHANIS MARVEL JAMREVAV|0
+KS9B0020020|ZULKIFLI RAHAKBAUW|0`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
+
+// Data Username & Password (122 siswa)
+const UP=`KS7A0020001|Agustina Martha Jalnuhubun|7A020001
+KS7A0020002|Alexa Sherryl Jabar|7A020002
+KS7A0020003|Billyand Noah Putra Gaga|7A020003
+KS7A0020004|Apolinaris Kelanit|7A020004
+KS7A0020005|Aprilia Ela Sirwutubun|7A020005
+KS7A0020006|Arlinda Metubun|7A020006
+KS7A0020007|Bois Alfa Ngutra|7A020007
+KS7A0020008|Dewi Putri Madubun|7A020008
+KS7A0020009|Elagren Marlatu Lukas Madubun|7A020009
+KS7A0020010|Fillano Pedrosa Masbaitubun|7A020010
+KS7A0020011|Gracia Viona Yanyaan|7A020011
+KS7A0020012|Johanes Obet Bertkat|7A020012
+KS7A0020013|Jonathan Alvaro Moriolkosu|7A020013
+KS7A0020014|Katarina Rumangun|7A020014
+KS7A0020015|Maria Ayu Paisa|7A020015
+KS7A0020016|Maria Syelena Suripatty Esomar|7A020016
+KS7A0020017|Maria Theresia Rumangun|7A020017
+KS7A0020018|Marlina Ingke Balriyanan|7A020018
+KS7A0020019|Menci Elsina Fantri Karatem|7A020019
+KS7A0020020|Oktovianus Jamrevav|7A020020
+KS7A0020021|Reza Dwi Eirlangga Jamlean|7A020021
+KS7A0020022|Steven Arnold Laumualy|7A020022
+KS7A0020023|Yohana T Resubun|7A020023
+KS7B0020001|Agnes Adriana Tawain.|7B020001
+KS7B0020002|Allmendo Xavi Remetwa.|7B020002
+KS7B0020003|Alexander Simon Vatubun|7B020003
+KS7B0020004|Aroby Tamher|7B020004
+KS7B0020005|Aprilia Lidwina Welikin|7B020005
+KS7B0020006|Blasius Paskal Dewaut|7B020006
+KS7B0020007|Chaylen Manis Koedoeboen|7B020007
+KS7B0020008|Firman Tanarubun|7B020008
+KS7B0020009|Herlina Abarua|7B020009
+KS7B0020010|Julius Marzelino Fadirubun|7B020010
+KS7B0020011|Jumadi Tamher|7B020011
+KS7B0020012|Kanisius Kebubun|7B020012
+KS7B0020013|Mintje Glorya Balubun|7B020013
+KS7B0020014|Margaretha Futubun|7B020014
+KS7B0020015|Mikha Desire Rukait|7B020015
+KS7B0020016|Mawar Sharon Kirwelakubun|7B020016
+KS7B0020017|Nahla Abidin Rahakratat|7B020017
+KS7B0020018|Penina Rumangun|7B020018
+KS7B0020019|Rafail Rengur|7B020019
+KS7B0020020|Udeta Insoraki Rumyaan|7B020020
+KS7B0020021|Yosep L Takerubun|7B020021
+KS7B0020022|Maria A. Heatubun|7B020022
+KS8A0020001|Alinda Ode|8A020001
+KS8A0020002|Andreas Balubun|8A020002
+KS8A0020003|Benedicta Petra Akbar|8A020003
+KS8A0020004|Carolus B. Varis Wemaf|8A020004
+KS8A0020005|Everets Jiffy Gattu|8A020005
+KS8A0020006|Filipho Aditya Somnaikubun|8A020006
+KS8A0020007|Gabriel Alferdo Ubyaan|8A020007
+KS8A0020008|Giofani Falentino Lutrun|8A020008
+KS8A0020009|Yoseph Erlangga Lamere|8A020009
+KS8A0020010|Klementina Fernatyanan|8A020010
+KS8A0020011|Mediana Aziera Jeujanan|8A020011
+KS8A0020012|Rahmatia Bugis|8A020012
+KS8A0020013|Reinal Moriolkosu|8A020013
+KS8A0020014|Shalmon Antony Rahangmetan|8A020014
+KS8A0020015|Vinsensius Edoardus Balubun|8A020015
+KS8A0020016|Welhelmus Zyerzeven Ngarbingan|8A020016
+KS8A0020017|Marius Rahalus|8A020017
+KS8A0020018|Harita F. Laritmas|8A020018
+KS8A0020019|Gracia F. Meterai|8A020019
+KS8B0020001|adriana theresia rahabav|8B020001
+KS8B0020002|Christ Noel Desandro Emyu Souhoka|8B020002
+KS8B0020003|Dewanti Sari Jamlean|8B020003
+KS8B0020004|Fabiano B. S. Janjaan|8B020004
+KS8B0020005|Gabriella Ernesta K. Kanarubun|8B020005
+KS8B0020006|Gregorius Higuen Balubun|8B020006
+KS8B0020007|Johanis Charles Woersok|8B020007
+KS8B0020008|Maria Gratia Maturbongs|8B020008
+KS8B0020009|Michael Joseph Masbaitubun|8B020009
+KS8B0020010|Oksen Petrus Letsoin|8B020010
+KS8B0020011|Paulina Chelsie Renwarin|8B020011
+KS8B0020012|Restha Jenifer Rahanra|8B020012
+KS8B0020013|Wensislaus Eko Wemaf|8B020013
+KS8B0020014|FILIO EMANUEL FAR-FAR|8B020014
+KS8B0020015|SYANE SELFI RAHANGMETAN|8B020015
+KS8B0020016|MARIA STEFANI ATBAR|8B020016
+KS8B0020017|Ronal Regen Rahayaan|8B020017
+KS8B0020018|Marwan R. Rahayaan|8B020018
+KS9A0020001|ADRIANUS RAHANAU|9A020001
+KS9A0020002|ADRIEL CALVINO RENWARIN|9A020002
+KS9A0020003|AMOS RISAL OILIRA|9A020003
+KS9A0020004|DIANA HERMINA HUAWAE|9A020004
+KS9A0020005|VIRGYLIUS M.Y. LEFTUNGUN|9A020005
+KS9A0020006|GIDION LEFTA|9A020006
+KS9A0020007|INTAN RAHAKBAUW|9A020007
+KS9A0020008|KEANO MACKENZIE RAHAJAAN|9A020008
+KS9A0020009|LEONTINA JEUJANAN|9A020009
+KS9A0020010|MARCELINO ALDO RENYAAN|9A020010
+KS9A0020011|MARIA MUTIARA WARAT|9A020011
+KS9A0020012|MELATI AUREL ROSYADI|9A020012
+KS9A0020013|MICHAELA P. D. TAPOTUBUN|9A020013
+KS9A0020014|NILAM MARSDA WABULA|9A020014
+KS9A0020015|ROBBEN JAKOBUS OHOILEDJAAN|9A020015
+KS9A0020016|ROSNATA PUSPITA RENWARIN|9A020016
+KS9A0020017|WELHELMUS RUMANGUN|9A020017
+KS9A0020018|WIDY CLEANDRA AZAZYA JABAR|9A020018
+KS9A0020019|WILIN NOTANUBUN|9A020019
+KS9A0020020|LANA RIECEL LABOBAR|9A020020
+KS9B0020001|ANDREAS LORENZO TAKERUBUN|9B020001
+KS9B0020002|ALFONSINA OHOIULUN|9B020002
+KS9B0020003|AZAN AKBAR TUKLOY|9B020003
+KS9B0020004|BERNADETA SIAHAYA|9B020004
+KS9B0020005|DINDA PELANGI RENHORAN|9B020005
+KS9B0020006|INTAN MASAHIDA|9B020006
+KS9B0020007|ISRAEL. ABRISYE LABETUBUN|9B020007
+KS9B0020008|KRISTINA ANGRENI WELERUBUN|9B020008
+KS9B0020009|MARIANUS NGARBINGAN|9B020009
+KS9B0020010|MARTHA MELSASAIL|9B020010
+KS9B0020011|MUSA EFRUAN|9B020011
+KS9B0020012|MARIA BIN METURAN|9B020012
+KS9B0020013|NADYA HOEKOEBOEN|9B020013
+KS9B0020014|RONI ANGGARA RAWULUNUBUN|9B020014
+KS9B0020015|RAHEL M TARANTEIN|9B020015
+KS9B0020016|SANDRA JEKLIN FARYO|9B020016
+KS9B0020017|YOHANIS MESI EFRUAN|9B020017
+KS9B0020018|YOHANIS MARVEL JAMREVAV|9B020018
+KS9B0020019|WILHELMUS RAHALOB|9B020019
+KS9B0020020|ZULKIFLI RAHAKBAUW|9B020020`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),p[2].trim()]});
+
+// Definisi mata pelajaran
+const SUBJECTS=[
+  {id:'bindo',name:'Bahasa Indonesia',col:'Bahasa Indonesia',data:()=>BI},
+  {id:'agkat',name:'Agama Katolik',col:'Agama Katolik',data:()=>AK},
+  {id:'bing',name:'Bahasa Iggris',col:'Bahasa Iggris',data:()=>BG},
+  {id:'pkn',name:'PKn',col:'pkN',data:()=>PK},
+  {id:'ips',name:'IPS',col:'IPS',data:()=>M.map(s=>[...s,0])},
+  {id:'agisl',name:'Agama Islam',col:'Agama Islam',data:()=>M.map(s=>[...s,0])},
+  {id:'mat',name:'Matematika',col:'Matematika',data:()=>M.map(s=>[...s,0])},
+  {id:'agprot',name:'Agama Protestan',col:'Agama Protestan',data:()=>M.map(s=>[...s,0])},
+  {id:'pjok',name:'PJOK',col:'PJOK',data:()=>M.map(s=>[...s,0])},
+  {id:'prak',name:'Prakarya',col:'Prakarya',data:()=>M.map(s=>[...s,0])},
+  {id:'tik',name:'TIK',col:'TIK',data:()=>M.map(s=>[...s,0])}
 ];
-const LU='https://drive.google.com/thumbnail?id=18-fVQ1HqVhduTzsYSxFj6PqJop4ifDru&sz=w400';
-const JU='https://drive.google.com/thumbnail?id=1bPq5AqZDXDs-c3oDxOWhydZr1c1CHK_a&sz=w800';
 
-// === STATE ===
-let CU=null,CP='dashboard',CS='bindo',CF='semua';
+const LOGO_URL='https://lh3.googleusercontent.com/d/18-fVQ1HqVhduTzsYSxFj6PqJop4ifDru';
+const JADWAL_URL='https://lh3.googleusercontent.com/d/1bPq5AqZDXDs-c3oDxOWhydZr1c1CHK_a';
+const DEFAULT_PENGUMUMAN='Jangan lupa subscribe YouTube Channel SMP Karel Sadsuitubun. Ujian OSN akan disiarkan secara live melalui YouTube. Saksikan dan dukung bersama. Jadwal Ujian OSN akan disampaikan kemudian. Terima kasih.';
 
-// === STORAGE ===
-function gac(){return parseInt(localStorage.getItem('sts_ac')||'0');}
-function iac(){localStorage.setItem('sts_ac',''+(gac()+1));}
-function gan(){const s=localStorage.getItem('sts_an');if(s)return s;return'Jangan lupa subscribe YouTube Channel SMP Karel Sadsuitubun. Ujian OSN akan disiarkan secara live melalui YouTube. Saksikan dan dukung bersama. Jadwal Ujian OSN akan disampaikan kemudian. Terima kasih.';}
-function san(t){localStorage.setItem('sts_an',t);}
+/* ===================== STATE ===================== */
+let role=''; // 'admin' atau 'umum'
+let curPage='dashboard';
+let curSubject='';
 
-// === TOAST ===
-function toast(m,t){const e=document.getElementById('toast');e.textContent=m;e.className='toast show '+(t||'ok');setTimeout(()=>e.className='toast',3000);}
+/* ===================== UTILITAS ===================== */
+function $(id){return document.getElementById(id)}
+function toast(msg,type='info'){
+  const c=$('toastContainer');
+  const t=document.createElement('div');
+  t.className='toast '+type;
+  t.innerHTML='<i class="fas fa-'+(type==='success'?'check-circle':type==='error'?'times-circle':'info-circle')+'"></i> '+msg;
+  c.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(40px)';t.style.transition='.3s';setTimeout(()=>t.remove(),300)},3000);
+}
+function scoreClass(v){
+  if(v>=80)return 'score-high';
+  if(v>=60)return 'score-mid';
+  return 'score-low';
+}
+function getPengumuman(){return localStorage.getItem('sts_pengumuman')||DEFAULT_PENGUMUMAN}
+function setPengumuman(t){localStorage.setItem('sts_pengumuman',t)}
+function getAccessCount(){return parseInt(localStorage.getItem('sts_access_count')||'0')}
+function incAccessCount(){localStorage.setItem('sts_access_count',''+(getAccessCount()+1))}
 
-// === LOGIN ===
+/* ===================== AUTH ===================== */
 function doLogin(){
-const u=document.getElementById('lu').value.trim(),p=document.getElementById('lp').value.trim(),e=document.getElementById('ler');
-if(u==='admin'&&p==='admin'){CU={u:'admin',r:'admin'};e.style.display='none';iac();enter();}
-else if(u==='ptsks'&&p==='ptsks'){CU={u:'ptsks',r:'umum'};e.style.display='none';iac();enter();}
-else e.style.display='block';
+  const u=$('loginUser').value.trim();
+  const p=$('loginPass').value.trim();
+  const err=$('loginError');
+  if(u==='admin'&&p==='admin'){role='admin';err.style.display='none';showApp()}
+  else if(u==='ptsks'&&p==='ptsks'){role='umum';err.style.display='none';showApp()}
+  else{err.textContent='Username atau password salah!';err.style.display='block'}
 }
-document.getElementById('lp').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
-document.getElementById('lu').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('lp').focus();});
-
-function doLogout(){CU=null;document.getElementById('mainApp').style.display='none';document.getElementById('loginPage').style.display='flex';document.getElementById('lu').value='';document.getElementById('lp').value='';}
-function enter(){document.getElementById('loginPage').style.display='none';document.getElementById('mainApp').style.display='block';bsn();nav('dashboard');}
-
-// === SIDEBAR ===
-function bsn(){
-const nv=document.getElementById('snav');
-let it=[{id:'dashboard',i:'fas fa-tachometer-alt',l:'Dashboard'},{id:'sts',i:'fas fa-file-alt',l:'Hasil STS'},{id:'userpass',i:'fas fa-users-cog',l:'User Password'}];
-if(CU.r==='admin')it.push({id:'settings',i:'fas fa-cog',l:'Pengaturan'});
-nv.innerHTML=it.map(x=>`<div class="ni${CP===x.id?' act':''}" onclick="nav('${x.id}')"><i class="${x.i}"></i><span>${x.l}</span></div>`).join('');
+function doLogout(){
+  role='';curPage='dashboard';curSubject='';
+  $('mainApp').style.display='none';
+  $('loginPage').style.display='flex';
+  $('loginUser').value='';$('loginPass').value='';
 }
-function tsb(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('ov').classList.toggle('show');}
-function csb(){document.getElementById('sidebar').classList.remove('open');document.getElementById('ov').classList.remove('show');}
+// Enter pada input login
+ $('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+ $('loginUser').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginPass').focus()});
 
-// === NAVIGASI ===
-function nav(p){CP=p;csb();bsn();const t={dashboard:'Dashboard',sts:'Hasil STS',userpass:'User Password',settings:'Pengaturan'};document.getElementById('pt').textContent=t[p]||'';document.getElementById('pa').innerHTML='';const c=document.getElementById('pc');c.className='fi';
-switch(p){case 'dashboard':rDash(c);break;case 'sts':rSTS(c);break;case 'userpass':rUP(c);break;case 'settings':rSet(c);break;}
-}
-
-// === SCORE BADGE ===
-function sb(v){if(v===0)return`<span class="sb sz">${v}</span>`;if(v>=75)return`<span class="sb sh1">${v}</span>`;if(v>=50)return`<span class="sb shm">${v}</span>`;return`<span class="sb slo">${v}</span>`;}
-
-// === DASHBOARD ===
-function rDash(c){
-let h=`<div class="sg">
-<div class="sc c1"><div class="si"><i class="fas fa-user-graduate"></i></div><div class="sv"><h4>${AS.length}</h4><p>Total Peserta Didik</p></div><div class="slg"><img src="${LU}" alt="Logo" onerror="this.style.display='none'"></div></div>
-<div class="sc c2"><div class="si"><i class="fas fa-key"></i></div><div class="sv"><h4>${AS.length}</h4><p>Jumlah Username & Password</p></div></div>`;
-if(CU.r==='admin')h+=`<div class="sc c3"><div class="si"><i class="fas fa-chart-line"></i></div><div class="sv"><h4>${gac()}</h4><p>Akses Aplikasi</p></div></div>`;
-h+=`</div><div class="dg"><div class="dc"><h3><i class="fas fa-bullhorn"></i> Pengumuman</h3><div class="at">${gan()}</div></div><div class="dc"><h3><i class="fas fa-calendar-alt"></i> Jadwal Ujian OSN</h3><img class="ji" src="${JU}" alt="Jadwal OSN" onerror="this.alt='Gambar jadwal tidak dapat dimuat'"></div></div>`;
-c.innerHTML=h;
+function showApp(){
+  incAccessCount();
+  $('loginPage').style.display='none';
+  $('mainApp').style.display='block';
+  $('userBadge').textContent=role==='admin'?'Administrator':'Umum';
+  buildSidebar();
+  navigateTo('dashboard');
 }
 
-// === HASIL STS ===
-function rSTS(c){
-let h=`<div class="tabs" id="stabs">`;
-MJ.forEach(s=>{h+=`<button class="tb${CS===s.id?' act':''}" onclick="ssub('${s.id}')">${s.nm}</button>`;});
-h+=`</div><div class="tw" style="border-radius:0 0 var(--r) var(--r)"><div class="fb"><label style="font-size:.8rem;font-weight:600">Kelas:</label><select id="kf" onchange="fkls(this.value)"><option value="semua">Semua Kelas</option><option value="7A">Kelas 7A</option><option value="7B">Kelas 7B</option><option value="8A">Kelas 8A</option><option value="8B">Kelas 8B</option><option value="9A">Kelas 9A</option><option value="9B">Kelas 9B</option></select></div><div class="ts" id="stw"></div>`;
-if(CU.r==='admin')h+=`<div id="stdl" style="padding:10px 14px;border-top:1px solid #edf3fa;text-align:right"></div>`;
-h+=`</div>`;
-c.innerHTML=h;
-rST();
+/* ===================== SIDEBAR ===================== */
+function buildSidebar(){
+  const nav=$('sidebarNav');
+  let html=`<div class="nav-item${curPage==='dashboard'?' active':''}" onclick="navigateTo('dashboard')"><i class="fas fa-home"></i> Dashboard</div>`;
+  // Hasil STS
+  html+=`<div class="nav-sub-toggle${curPage==='sts'?' active':''}${curPage==='sts'?' open':''}" onclick="toggleSTSMenu(this)"><i class="fas fa-chart-bar"></i> Hasil STS<i class="fas fa-chevron-right chevron"></i></div>`;
+  html+=`<div class="nav-sub${curPage==='sts'?' open':''}">`;
+  SUBJECTS.forEach(s=>{
+    html+=`<div class="nav-item${curSubject===s.id?' active':''}" onclick="selectSubject('${s.id}')">${s.name}</div>`;
+  });
+  html+=`</div>`;
+  // User Password
+  html+=`<div class="nav-item${curPage==='userpass'?' active':''}" onclick="navigateTo('userpass')"><i class="fas fa-key"></i> User Password</div>`;
+  // Pengaturan (hanya admin)
+  if(role==='admin'){
+    html+=`<div class="nav-item${curPage==='settings'?' active':''}" onclick="navigateTo('settings')"><i class="fas fa-cog"></i> Pengaturan</div>`;
+  }
+  nav.innerHTML=html;
 }
-function ssub(id){CS=id;CF='semua';document.querySelectorAll('.tb').forEach(b=>b.classList.remove('act'));document.querySelector(`.tb[onclick="ssub('${id}')"]`).classList.add('act');const s=document.getElementById('kf');if(s)s.value='semua';rST();}
-function fkls(v){CF=v;rST();}
-function rST(){
-const su=MJ.find(s=>s.id===CS);
-let rows=[];
-if(su.z){rows=AS.map(s=>({n:s.n,u:s.u,nm:s.nm,s:0}));}
-else{rows=su.d.map(s=>({n:s.n,u:s.u,nm:s.nm,s:s.s}));}
-if(CF!=='semua')rows=rows.filter(r=>gk(r.u)===CF);
-let h=`<table><thead><tr><th>No</th><th>Username</th><th>Nama</th><th>${su.nm}</th></tr></thead><tbody>`;
-if(!rows.length)h+=`<tr><td colspan="4" style="text-align:center;padding:28px;color:var(--tx2)">Tidak ada data untuk kelas ini</td></tr>`;
-rows.forEach(r=>{h+=`<tr><td>${r.n}</td><td>${r.u}</td><td>${r.nm}</td><td>${sb(r.s)}</td></tr>`;});
-h+=`</tbody></table>`;
-document.getElementById('stw').innerHTML=h;
-const dl=document.getElementById('stdl');
-if(dl&&CU.r==='admin')dl.innerHTML=`<button class="btn bp bsm" onclick="dlSTS('${CS}')"><i class="fas fa-download"></i> Download ${su.nm}</button>`;
+function toggleSTSMenu(el){
+  el.classList.toggle('open');
+  const sub=el.nextElementSibling;
+  sub.classList.toggle('open');
 }
-function dlSTS(id){
-const su=MJ.find(s=>s.id===id);let rows=[];
-if(su.z)rows=AS.map(s=>[s.n,s.u,s.nm,0]);else rows=su.d.map(s=>[s.n,s.u,s.nm,s.s]);
-let csv='No,Username,Nama,'+su.nm+'\n';rows.forEach(r=>csv+=r.join(',')+'\n');
-dlF(csv,'STS_'+su.nm.replace(/ /g,'_')+'.csv','text/csv');toast('Data berhasil diunduh!');
+function toggleSidebar(){
+  $('sidebar').classList.toggle('open');
+  $('sidebarOverlay').classList.toggle('open');
 }
 
-// === USER PASSWORD ===
-function rUP(c){
-let btns='';
-if(CU.r==='admin')btns=`<div class="bg"><button class="btn bp bsm" onclick="dlUP()"><i class="fas fa-download"></i> Download</button><button class="btn bs bsm" onclick="document.getElementById('fi1').click()"><i class="fas fa-file-import"></i> Import</button><button class="btn bw bsm" onclick="upUP()"><i class="fas fa-upload"></i> Upload</button></div>`;
-document.getElementById('pa').innerHTML=btns;
-c.innerHTML=`<div class="tw"><div class="fb"><label style="font-size:.8rem;font-weight:600"><i class="fas fa-search"></i> Cari:</label><input type="text" id="sup" placeholder="Cari berdasarkan nama..." oninput="sUP(this.value)"></div><div class="ts" id="utw"></div></div>`;
-rUT(AS);
+/* ===================== NAVIGASI ===================== */
+function navigateTo(page){
+  curPage=page;curSubject='';
+  buildSidebar();
+  $('topbarTitle').textContent=page==='dashboard'?'Dashboard':page==='userpass'?'User Password':page==='settings'?'Pengaturan':'Hasil STS';
+  // Tutup sidebar mobile
+  $('sidebar').classList.remove('open');
+  $('sidebarOverlay').classList.remove('open');
+  const c=$('contentArea');
+  if(page==='dashboard')renderDashboard(c);
+  else if(page==='userpass')renderUserPass(c);
+  else if(page==='settings')renderSettings(c);
+  else if(page==='sts'){renderSTSPlaceholder(c)}
 }
-function rUT(d){
-let h=`<table><thead><tr><th>No</th><th>Username</th><th>Nama</th><th>Password</th></tr></thead><tbody>`;
-d.forEach(s=>{h+=`<tr><td>${s.n}</td><td>${s.u}</td><td>${s.nm}</td><td>${gp(s.u)}</td></tr>`;});
-h+=`</tbody></table>`;
-document.getElementById('utw').innerHTML=h;
+function selectSubject(id){
+  curPage='sts';curSubject=id;
+  buildSidebar();
+  const s=SUBJECTS.find(x=>x.id===id);
+  $('topbarTitle').textContent='Hasil STS - '+s.name;
+  $('sidebar').classList.remove('open');
+  $('sidebarOverlay').classList.remove('open');
+  renderSTS($('contentArea'),s);
 }
-function sUP(q){q=q.toLowerCase().trim();if(!q){rUT(AS);return;}rUT(AS.filter(s=>s.nm.toLowerCase().includes(q)));}
-function dlUP(){let csv='No,Username,Nama,Password\n';AS.forEach(s=>csv+=s.n+','+s.u+','+s.nm+','+gp(s.u)+'\n');dlF(csv,'Data_Username_Password.csv','text/csv');toast('Data berhasil diunduh!');}
-function upUP(){toast('Gunakan tombol Import untuk memuat data','info');}
-document.getElementById('fi1').addEventListener('change',function(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(ev){try{const ln=ev.target.result.trim().split('\n');if(ln.length<2){toast('File tidak valid','no');return;}toast('Data berhasil diimport! ('+(ln.length-1)+' baris)');}catch(er){toast('Gagal membaca file','no');}};r.readAsText(f);e.target.value='';});
+function renderSTSPlaceholder(c){
+  c.innerHTML=`<div class="page active"><div class="card" style="text-align:center;padding:60px 20px"><i class="fas fa-hand-pointer" style="font-size:2.5rem;color:var(--primary-l);margin-bottom:14px;display:block"></i><h3 style="margin-bottom:8px">Pilih Mata Pelajaran</h3><p style="color:var(--muted);font-size:.85rem">Klik salah satu mata pelajaran di menu sidebar untuk melihat hasil STS.</p></div></div>`;
+}
 
-// === PENGATURAN ===
-function rSet(c){
-c.innerHTML=`<div class="stg">
-<div class="kc"><h3><i class="fas fa-image"></i> Logo Sekolah</h3><img src="${LU}" alt="Logo Sekolah" onerror="this.alt='Logo tidak tersedia'"><p style="text-align:center;font-size:.8rem;color:var(--tx2)">Logo SMP Karel Sadsuitubun</p></div>
-<div class="kc"><h3><i class="fas fa-database"></i> Kelola Data</h3><p style="font-size:.8rem;color:var(--tx2);margin-bottom:14px">Download atau import keseluruhan data.</p><div class="bg" style="flex-direction:column"><button class="btn bp" onclick="dlAll()" style="width:100%;justify-content:center"><i class="fas fa-download"></i> Download Semua Data</button><button class="btn bs" onclick="document.getElementById('fi2').click()" style="width:100%;justify-content:center;margin-top:8px"><i class="fas fa-file-import"></i> Import Semua Data</button></div></div>
-<div class="kc" style="grid-column:1/-1"><h3><i class="fas fa-bullhorn"></i> Pengumuman</h3><textarea id="ani">${gan()}</textarea><div style="margin-top:10px;text-align:right"><button class="btn bp" onclick="svAn()"><i class="fas fa-save"></i> Simpan Pengumuman</button></div></div>
-<div class="kc" style="grid-column:1/-1"><h3><i class="fas fa-calendar-alt"></i> Jadwal Ujian OSN</h3><img src="${JU}" alt="Jadwal OSN" style="width:100%;max-width:560px;border-radius:7px;display:block;margin:0 auto" onerror="this.alt='Gambar jadwal tidak dapat dimuat'"></div>
-</div>`;
+/* ===================== DASHBOARD ===================== */
+function renderDashboard(c){
+  const totalPD=M.length;
+  const totalUP=UP.length;
+  const akses=getAccessCount();
+  let cards=`
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+      <div class="stat-info"><div class="stat-label">Total Peserta Didik</div><div class="stat-value">${totalPD}</div></div>
+      <img class="stat-logo" src="${LOGO_URL}" alt="Logo" onerror="this.style.display='none'">
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon teal"><i class="fas fa-key"></i></div>
+      <div class="stat-info"><div class="stat-label">Jumlah Username & Password</div><div class="stat-value">${totalUP}</div></div>
+    </div>`;
+  if(role==='admin'){
+    cards+=`
+    <div class="stat-card">
+      <div class="stat-icon green"><i class="fas fa-sign-in-alt"></i></div>
+      <div class="stat-info"><div class="stat-label">Total Akses Aplikasi</div><div class="stat-value">${akses}</div></div>
+    </div>`;
+  }
+  cards+=`</div>`;
+  // Pengumuman
+  const pgm=getPengumuman();
+  cards+=`
+  <div class="pengumuman-box">
+    <h4><i class="fas fa-bullhorn"></i> Pengumuman</h4>
+    <p>${pgm.replace(/\n/g,'<br>')}</p>
+    <img class="jadwal-img" src="${JADWAL_URL}" alt="Jadwal OSN" onerror="this.style.display='none'">
+  </div>`;
+  c.innerHTML=`<div class="page active">${cards}</div>`;
 }
-function svAn(){const v=document.getElementById('ani').value.trim();if(!v){toast('Pengumuman tidak boleh kosong','no');return;}san(v);toast('Pengumuman berhasil disimpan!');}
-function dlAll(){
-const data={pengumuman:gan(),bahasa_indonesia:BD,agama_katolik:AK,user_password:AS.map(s=>({no:s.n,username:s.u,nama:s.nm,password:gp(s.u)}))};
-dlF(JSON.stringify(data,null,2),'Data_Lengkap_STS.json','application/json');toast('Semua data berhasil diunduh!');
-}
-document.getElementById('fi2').addEventListener('change',function(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(ev){try{const d=JSON.parse(ev.target.result);if(d.pengumuman)san(d.pengumuman);toast('Semua data berhasil diimport!');nav('dashboard');}catch(er){toast('Format file tidak valid','no');}};r.readAsText(f);e.target.value='';});
 
-// === UTILITAS ===
-function dlF(c,n,t){const b=new Blob([c],{type:t+';charset=utf-8'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);}
+/* ===================== HASIL STS ===================== */
+function renderSTS(c,subj){
+  const data=subj.data();
+  let html=`<div class="page active"><div class="card">`;
+  html+=`<div class="card-title"><i class="fas fa-table"></i> Hasil STS - ${subj.name}</div>`;
+  // Download hanya admin
+  if(role==='admin'){
+    html+=`<div style="margin-bottom:12px"><button class="btn btn-success btn-sm" onclick="downloadSTS('${subj.id}')"><i class="fas fa-download"></i> Download</button></div>`;
+  }
+  // Pencarian
+  html+=`<div class="search-wrap" style="margin-bottom:12px"><i class="fas fa-search"></i><input type="text" placeholder="Cari berdasarkan nama..." oninput="filterSTS(this.value,'${subj.id}')"></div>`;
+  html+=`<div class="table-wrap"><table><thead><tr><th>No</th><th>Username</th><th>Nama</th><th>${subj.col}</th></tr></thead><tbody id="stsBody_${subj.id}">`;
+  data.forEach((d,i)=>{
+    const sc=d[2];
+    html+=`<tr><td>${i+1}</td><td>${d[0]}</td><td>${d[1]}</td><td class="${scoreClass(sc)}">${sc}</td></tr>`;
+  });
+  html+=`</tbody></table></div></div></div>`;
+  c.innerHTML=html;
+}
+function filterSTS(q,sid){
+  const subj=SUBJECTS.find(s=>s.id===sid);
+  const data=subj.data();
+  const ql=q.toLowerCase().trim();
+  const tb=$('stsBody_'+sid);
+  let html='';
+  let no=0;
+  data.forEach(d=>{
+    if(!ql||d[1].toLowerCase().includes(ql)){
+      no++;
+      html+=`<tr><td>${no}</td><td>${d[0]}</td><td>${d[1]}</td><td class="${scoreClass(d[2])}">${d[2]}</td></tr>`;
+    }
+  });
+  if(!html)html=`<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">Tidak ditemukan</td></tr>`;
+  tb.innerHTML=html;
+}
+function downloadSTS(sid){
+  const subj=SUBJECTS.find(s=>s.id===sid);
+  const data=subj.data();
+  let csv='No,Username,Nama,'+subj.col+'\n';
+  data.forEach((d,i)=>{csv+=(i+1)+',"'+d[0]+'","'+d[1]+'",'+d[2]+'\n'});
+  downloadFile(csv,'STS_'+subj.name.replace(/ /g,'_')+'.csv','text/csv');
+  toast('Data berhasil didownload','success');
+}
+
+/* ===================== USER PASSWORD ===================== */
+function renderUserPass(c){
+  let html=`<div class="page active"><div class="card">`;
+  html+=`<div class="card-title"><i class="fas fa-key"></i> Data Username & Password</div>`;
+  // Tombol admin saja
+  if(role==='admin'){
+    html+=`<div class="btn-group" style="margin-bottom:12px">
+      <button class="btn btn-success btn-sm" onclick="downloadUserPass()"><i class="fas fa-download"></i> Download</button>
+      <button class="btn btn-outline btn-sm" onclick="$('importUP').click()"><i class="fas fa-file-import"></i> Import</button>
+      <button class="btn btn-primary btn-sm" onclick="$('uploadUP').click()"><i class="fas fa-upload"></i> Upload</button>
+      <input type="file" id="importUP" accept=".csv" style="display:none" onchange="importUserPass(this,true)">
+      <input type="file" id="uploadUP" accept=".csv" style="display:none" onchange="importUserPass(this,false)">
+    </div>`;
+  }
+  // Pencarian
+  html+=`<div class="search-wrap" style="margin-bottom:12px"><i class="fas fa-search"></i><input type="text" placeholder="Cari berdasarkan nama..." oninput="filterUP(this.value)"></div>`;
+  html+=`<div class="table-wrap"><table><thead><tr><th>No</th><th>Username</th><th>Nama</th><th>Password</th></tr></thead><tbody id="upBody">`;
+  UP.forEach((d,i)=>{
+    html+=`<tr><td>${i+1}</td><td>${d[0]}</td><td>${d[1]}</td><td><code style="background:#e3f2fd;padding:2px 8px;border-radius:4px;font-size:.8rem">${d[2]}</code></td></tr>`;
+  });
+  html+=`</tbody></table></div></div></div>`;
+  c.innerHTML=html;
+}
+function filterUP(q){
+  const ql=q.toLowerCase().trim();
+  const tb=$('upBody');
+  let html='';let no=0;
+  UP.forEach(d=>{
+    if(!ql||d[1].toLowerCase().includes(ql)){
+      no++;
+      html+=`<tr><td>${no}</td><td>${d[0]}</td><td>${d[1]}</td><td><code style="background:#e3f2fd;padding:2px 8px;border-radius:4px;font-size:.8rem">${d[2]}</code></td></tr>`;
+    }
+  });
+  if(!html)html=`<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">Tidak ditemukan</td></tr>`;
+  tb.innerHTML=html;
+}
+function downloadUserPass(){
+  let csv='No,Username,Nama,Password\n';
+  UP.forEach((d,i)=>{csv+=(i+1)+',"'+d[0]+'","'+d[1]+'","'+d[2]+'"\n'});
+  downloadFile(csv,'Username_Password.csv','text/csv');
+  toast('Data berhasil didownload','success');
+}
+function importUserPass(input,replace){
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const lines=e.target.result.split('\n').filter(l=>l.trim());
+      if(lines.length<2){toast('File kosong atau tidak valid','error');return}
+      let imported=0;
+      for(let i=1;i<lines.length;i++){
+        const cols=lines[i].match(/(".*?"|[^,]+)/g);
+        if(cols&&cols.length>=4){
+          const u=cols[1].replace(/"/g,'').trim();
+          const n=cols[2].replace(/"/g,'').trim();
+          const p=cols[3].replace(/"/g,'').trim();
+          if(u&&n&&p){
+            if(replace){
+              // Replace: hanya tambahkan jika belum ada
+              const idx=UP.findIndex(x=>x[0]===u);
+              if(idx===-1)UP.push([u,n,p]);
+              else{UP[idx][1]=n;UP[idx][2]=p}
+            }else{
+              UP.push([u,n,p]);
+            }
+            imported++;
+          }
+        }
+      }
+      toast('Berhasil import '+imported+' data','success');
+      renderUserPass($('contentArea'));
+    }catch(err){toast('Gagal membaca file: '+err.message,'error')}
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+
+/* ===================== PENGATURAN ===================== */
+function renderSettings(c){
+  const pgm=getPengumuman();
+  let html=`<div class="page active">`;
+  // Logo
+  html+=`<div class="card">
+    <div class="card-title"><i class="fas fa-image"></i> Logo Sekolah</div>
+    <img class="settings-logo" src="${LOGO_URL}" alt="Logo Sekolah" onerror="this.alt='Logo tidak tersedia'">
+  </div>`;
+  // Download & Import seluruh data
+  html+=`<div class="card">
+    <div class="card-title"><i class="fas fa-database"></i> Kelola Data</div>
+    <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px">Download seluruh data aplikasi sebagai file backup, atau import data yang sebelumnya sudah dibuat.</p>
+    <div class="btn-group">
+      <button class="btn btn-success" onclick="downloadAllData()"><i class="fas fa-download"></i> Download Semua Data</button>
+      <button class="btn btn-primary" onclick="$('importAll').click()"><i class="fas fa-file-import"></i> Import Data</button>
+      <input type="file" id="importAll" accept=".json" style="display:none" onchange="importAllData(this)">
+    </div>
+  </div>`;
+  // Pengumuman
+  html+=`<div class="card">
+    <div class="card-title"><i class="fas fa-bullhorn"></i> Pengaturan Pengumuman</div>
+    <div class="settings-section">
+      <label>Teks Pengumuman (ditampilkan di Dashboard)</label>
+      <textarea id="pengumumanInput">${pgm}</textarea>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="savePengumuman()"><i class="fas fa-save"></i> Simpan Pengumuman</button>
+      </div>
+    </div>
+  </div>`;
+  // Jadwal
+  html+=`<div class="card">
+    <div class="card-title"><i class="fas fa-calendar-alt"></i> Jadwal Ujian OSN</div>
+    <img style="max-width:100%;border-radius:8px" src="${JADWAL_URL}" alt="Jadwal OSN" onerror="this.alt='Jadwal tidak tersedia';this.style.padding='20px';this.style.background='#f5f8ff'">
+  </div>`;
+  html+=`</div>`;
+  c.innerHTML=html;
+}
+function savePengumuman(){
+  const v=$('pengumumanInput').value.trim();
+  if(!v){toast('Pengumuman tidak boleh kosong','error');return}
+  setPengumuman(v);
+  toast('Pengumuman berhasil disimpan','success');
+}
+function downloadAllData(){
+  const allData={
+    bindo:BI, agkat:AK, bing:BG, PKN:PK, userpass:UP,
+    pengumuman:getPengumuman(),
+    accessCount:getAccessCount(),
+    exportedAt:new Date().toISOString()
+  };
+  const json=JSON.stringify(allData,null,2);
+  downloadFile(json,'Data_STS_SMP_Karel.json','application/json');
+  toast('Semua data berhasil didownload','success');
+}
+function importAllData(input){
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const data=JSON.parse(e.target.result);
+      let count=0;
+      if(data.bindo&&Array.isArray(data.bindo)){BI.length=0;data.bindo.forEach(d=>BI.push(d));count++}
+      if(data.agkat&&Array.isArray(data.agkat)){AK.length=0;data.agkat.forEach(d=>AK.push(d));count++}
+      if(data.agkat&&Array.isArray(data.bing)){BG.length=0;data.agkat.forEach(d=>BG.push(d));count++}
+      if(data.agkat&&Array.isArray(data.agkat)){PK.length=0;data.agkat.forEach(d=>PK.push(d));count++}
+
+      if(data.userpass&&Array.isArray(data.userpass)){UP.length=0;data.userpass.forEach(d=>UP.push(d));count++}
+      if(data.pengumuman)setPengumuman(data.pengumuman);
+      if(data.accessCount!==undefined)localStorage.setItem('sts_access_count',''+data.accessCount);
+      toast('Berhasil import '+count+' kategori data','success');
+    }catch(err){toast('Gagal membaca file: '+err.message,'error')}
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+
+/* ===================== DOWNLOAD HELPER ===================== */
+function downloadFile(content,filename,type){
+  const blob=new Blob([content],{type:type+';charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 </script>
 </body>
 </html>
