@@ -1047,7 +1047,7 @@ const SUBJECTS=[
 ];
 
 const LOGO_URL='https://lh3.googleusercontent.com/d/18-fVQ1HqVhduTzsYSxFj6PqJop4ifDru';
-const JADWAL_URL='https://lh3.googleusercontent.com/d/1bPq5AqZDXDs-c3oDxOWhydZr1c1CHK_a';
+const JADWAL_URL='https://lh3.googleusercontent.com/d/1JZEbdhmvNZyzV5jskjv46yVCpZuouJlM';
 const DEFAULT_PENGUMUMAN='Jangan lupa subscribe YouTube Channel SMP Karel Sadsuitubun. Ujian OSN akan disiarkan secara live melalui YouTube. Saksikan dan dukung bersama. Jadwal Ujian OSN akan disampaikan kemudian. Terima kasih.';
 
 /* ===================== STATE ===================== */
