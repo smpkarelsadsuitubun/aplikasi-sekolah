@@ -570,7 +570,7 @@ KS8A0020009|Yoseph Erlangga Lamere|0
 KS8A0020010|Klementina Fernatyanan|28
 KS8A0020011|Mediana Aziera Jeujanan|35
 KS8A0020012|Rahmatia Bugis|24
-KS8A0020013|Reinal Moriolkosu|0
+KS8A0020013|Reinal Moriolkosu|62
 KS8A0020014|Shalmon Antony Rahangmetan|67
 KS8A0020015|Vinsensius Edoardus Balubun|41
 KS8A0020016|Welhelmus Zyerzeven Ngarbingan|23
@@ -904,6 +904,183 @@ KS9B0020003|AZAN AKBAR TUKLOY|80
 KS9B0020005|DINDA PELANGI RENHORAN|92
 KS9B0020006|INTAN MASAHIDA|92`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
 
+// Matematika (123 siswa)
+const MT=`KS7A0020001|Agustina Martha Jalnuhubun|0
+KS7A0020002|Alexa Sherryl Jabar|60
+KS7A0020003|Billyand Noah Putra Gaga|60
+KS7A0020004|Apolinaris Kelanit|63
+KS7A0020005|Aprilia Ela Sirwutubun|29
+KS7A0020006|Arlinda Metubun|39
+KS7A0020007|Bois Alfa Ngutra|24
+KS7A0020008|Dewi Putri Madubun|42
+KS7A0020009|Elagren Marlatu Lukas Madubun|26
+KS7A0020010|Fillano Pedrosa Masbaitubun|29
+KS7A0020011|Gracia Viona Yanyaan|40
+KS7A0020012|Johanes Obet Bertkat|42
+KS7A0020013|Jonathan Alvaro Moriolkosu|45
+KS7A0020014|Katarina Rumangun|0
+KS7A0020015|Maria Ayu Paisa|53
+KS7A0020016|Maria Syelena Suripatty Esomar|45
+KS7A0020017|Maria Theresia Rumangun|38
+KS7A0020018|Marlina Ingke Balriyanan|44
+KS7A0020019|Menci Elsina Fantri Karatem|58
+KS7A0020020|Oktovianus Jamrevav|22
+KS7A0020021|Reza Dwi Eirlangga Jamlean|0
+KS7A0020022|Steven Arnold Laumualy|43
+KS7A0020023|Yohana T Resubun|50
+KS7B0020001|Agnes Adriana Tawain.|60
+KS7B0020002|Allmendo Xavi Remetwa.|55
+KS7B0020003|Alexander Simon Vatubun.|21
+KS7B0020004|Aroby Tamher|29
+KS7B0020005|Aprilia Lidwina Welikin|0
+KS7B0020006|Blasius Paskal Dewaut|0
+KS7B0020007|Chaylen Manis Koedoeboen|40
+KS7B0020008|Firman Tanarubun|31
+KS7B0020009|Herlina Abarua|31
+KS7B0020010|Julius Marzelino Fadirubun|32
+KS7B0020011|Jumadi Tamher|30
+KS7B0020012|Kanisius Kebubun|0
+KS7B0020013|Mintje Glorya Balubun|26
+KS7B0020014|Margaretha Futubun|13
+KS7B0020015|Mikha Desire Rukait|53
+KS7B0020016|Mawar Sharon Kirwelakubun|40
+KS7B0020017|Nahla Abidin Rahakratat|34
+KS7B0020018|Penina Rumangun|39
+KS7B0020019|Rafail Rengur|48
+KS7B0020020|Udeta Insoraki Rumyaan|34
+KS7B0020021|Yosep L Takerubun|31
+KS7B0020022|Maria A. Heatubun|22
+KS8A0020001|Alinda Ode|70
+KS8A0020002|Andreas Balubun|79
+KS8A0020003|Benedicta Petra Akbar|72
+KS8A0020004|Carolus B. Varis Wemaf|42
+KS8A0020005|Everets Jiffy Gattu|62
+KS8A0020006|Gregorius Higuen Balubun|57
+KS8A0020007|Johanis Charles Woersok|0
+KS8A0020008|Maria Gratia Maturbongs|0
+KS8A0020009|Yoseph Erlangga Lamere|56
+KS8A0020010|Klementina Fernatyanan|59
+KS8A0020011|Mediana Aziera Jeujanan|74
+KS8A0020012|Rahmatia Bugis|64
+KS8A0020013|Reinal Moriolkosu|79
+KS8A0020014|Shalmon Antony Rahangmetan|72
+KS8A0020015|Vinsensius Edoardus Balubun|12
+KS8A0020016|Welhelmus Zyerzeven Ngarbingan|46
+KS8A0020017|Ronal Regen Rahayaan|54
+KS8A0020018|Harita F. Laritmas|62
+KS8A0020019|Gracia F. Meterai|0
+KS8A0020020|Revandi Mukujei|37
+KS8B0020001|adriana theresia rahabav|43
+KS8B0020002|Christ Noel Desandro Emyu Souhoka|73
+KS8B0020003|Dewanti Sari Jamlean|40
+KS8B0020004|Fabiano B. S. Janjaan|21
+KS8B0020005|Gabriella Ernesta K. Kanarubun|47
+KS8B0020006|Gregorius Higuen Balubun|49
+KS8B0020007|Johanis Charles Woersok|58
+KS8B0020008|Maria Gratia Maturbongs|78
+KS8B0020009|Michael Joseph Masbaitubun|72
+KS8B0020010|Oksen Petrus Letsoin|52
+KS8B0020011|Paulina Chelsie Renwarin|43
+KS8B0020012|Restha Jenifer Rahanra|45
+KS8B0020013|Wensislaus Eko Wemaf|34
+KS8B0020014|FILIO EMANUEL FAR-FAR|53
+KS8B0020015|SYANE SELFI RAHANGMETAN|45
+KS8B0020016|MARIA STEFANI ATBAR|62
+KS8B0020017|Ronal Regen Rahayaan|0
+KS8B0020018|Marwan R. Rahayaan|26
+KS9A0020001|ADRIANUS RAHANAU|45
+KS9A0020002|ADRIEL CALVINO RENWARIN|43
+KS9A0020003|AMOS RISAL OILIRA|52
+KS9A0020004|DIANA HERMINA HUAWAE|45
+KS9A0020005|VIRGYLIUS M.Y. LEFTUNGUN|31
+KS9A0020006|GIDION LEFTA|38
+KS9A0020007|INTAN RAHAKBAUW|64
+KS9A0020008|KEANO MACKENZIE RAHAJAAN|58
+KS9A0020009|LEONTINA JEUJANAN|70
+KS9A0020010|MARCELINO ALDO RENYAAN|50
+KS9A0020011|MARIA MUTIARA WARAT|72
+KS9A0020012|MELATI AUREL ROSYADI|65
+KS9A0020013|MICHAELA P. D. TAPOTUBUN|70
+KS9A0020014|NILAM MARSDA WABULA|54
+KS9A0020015|ROBBEN JAKOBUS OHOILEDJAAN|0
+KS9A0020016|ROSNATA PUSPITA RENWARIN|35
+KS9A0020017|WELHELMUS RUMANGUN|77
+KS9A0020018|WIDY CLEANDRA AZAZYA JABAR|70
+KS9A0020019|WILIN NOTANUBUN|72
+KS9A0020020|LANA RIECEL LABOBAR|61
+KS9B0020001|ANDREAS LORENZO TAKERUBUN|67
+KS9B0020002|ALFONSINA OHOIULUN|25
+KS9B0020003|AZAN AKBAR TUKLOY|41
+KS9B0020004|BERNADETA SIAHAYA|28
+KS9B0020005|DINDA PELANGI RENHORAN|74
+KS9B0020006|INTAN MASAHIDA|0
+KS9B0020007|ISRAEL. ABRISYE LABETUBUN|0
+KS9B0020008|KRISTINA ANGRENI WELERUBUN|44
+KS9B0020009|MARIANUS NGARBINGAN|0
+KS9B0020010|MARTHA MELSASAIL|51
+KS9B0020011|MUSA EFRUAN|67
+KS9B0020012|MARIA BIN METURAN|48
+KS9B0020013|NADYA HOEKOEBOEN|65
+KS9B0020014|RONI ANGGARA RAWULUNUBUN|0
+KS9B0020015|RAHEL M TARANTEIN|69
+KS9B0020016|SANDRA JEKLIN FARYO|45
+KS9B0020017|YOHANIS MESI EFRUAN|35
+KS9B0020018|YOHANIS MARVEL JAMREVAV|0
+KS9B0020019|WILHELMUS RAHALOB|0
+KS9B0020020|ZULKIFLI RAHAKBAUW|53`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
+
+
+// Agama Protestan (50 siswa)
+const AP=`KS7A0020002|Alexa Sherryl Jabar|85
+KS7A0020003|Billyand Noah Putra Gaga|79
+KS7A0020006|Arlinda Metubun|71
+KS7A0020007|Bois Alfa Ngutra|81
+KS7A0020008|Dewi Putri Madubun|81
+KS7A0020009|Elagren Marlatu Lukas Madubun|74
+KS7A0020010|Fillano Pedrosa Masbaitubun|70
+KS7A0020012|Johanes Obet Bertkat|65
+KS7A0020013|Jonathan Alvaro Moriolkosu|83
+KS7A0020019|Menci Elsina Fantri Karatem|88
+KS7A0020022|Steven Arnold Laumualy|50
+KS7B0020001|Agnes Adriana Tawain.|82
+KS7B0020003|Alexander Simon Vatubun.|39
+KS7B0020007|Chaylen Manis Koedoeboen|73
+KS7B0020009|Herlina Abarua|70
+KS7B0020013|Mintje Glorya Balubun|75
+KS7B0020014|Margaretha Futubun|32
+KS7B0020015|Mikha Desire Rukait|88
+KS7B0020019|Rafail Rengur|61
+KS8A0020001|Alinda Ode|69.5
+KS8A0020005|Everets Jiffy Gattu|81
+KS8A0020006|Gregorius Higuen Balubun|57
+KS8A0020013|Reinal Moriolkosu|69
+KS8A0020014|Shalmon Antony Rahangmetan|83
+KS8A0020016|Welhelmus Zyerzeven Ngarbingan|41.5
+KS8A0020018|Harita F. Laritmas|57.5
+KS8A0020020|Revandi Mukujei|59
+KS8B0020002|Christ Noel Desandro Emyu Souhoka|80
+KS8B0020007|Johanis Charles Woersok|82
+KS8B0020009|Michael Joseph Masbaitubun|89
+KS8B0020012|Restha Jenifer Rahanra|52
+KS8B0020014|FILIO EMANUEL FAR-FAR|49
+KS8B0020015|SYANE SELFI RAHANGMETAN|85
+KS8B0020016|MARIA STEFANI ATBAR|62
+KS9A0020002|ADRIEL CALVINO RENWARIN|63
+KS9A0020003|AMOS RISAL OILIRA|65
+KS9A0020004|DIANA HERMINA HUAWAE|76
+KS9A0020006|GIDION LEFTA|41
+KS9A0020007|INTAN RAHAKBAUW|88
+KS9A0020008|KEANO MACKENZIE RAHAJAAN|78
+KS9A0020010|MARCELINO ALDO RENYAAN|70
+KS9A0020013|MICHAELA P. D. TAPOTUBUN|82
+KS9A0020018|WIDY CLEANDRA AZAZYA JABAR|82
+KS9A0020019|WILIN NOTANUBUN|83
+KS9A0020020|LANA RIECEL LABOBAR|74
+KS9B0020010|MARTHA MELSASAIL|75
+KS9B0020011|MUSA EFRUAN|82
+KS9B0020013|NADYA HOEKOEBOEN|78
+KS9B0020015|RAHEL M TARANTEIN|78
+KS9B0020020|ZULKIFLI RAHAKBAUW|51`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
 
 // Data Username & Password (123 siswa)
 const UP=`KS7A0020001|Agustina Martha Jalnuhubun|7A020001
@@ -1039,8 +1216,8 @@ const SUBJECTS=[
   {id:'ipa',name:'IPA',col:'IPA',data:()=>PA},  
   {id:'ips',name:'IPS',col:'IPS',data:()=>M.map(s=>[...s,0])},
   {id:'agisl',name:'Agama Islam',col:'Agama Islam',data:()=>AI},
-  {id:'mat',name:'Matematika',col:'Matematika',data:()=>M.map(s=>[...s,0])},
-  {id:'agprot',name:'Agama Protestan',col:'Agama Protestan',data:()=>M.map(s=>[...s,0])},
+  {id:'mtk',name:'Matematika',col:'Matematika',data:()=>MT},
+  {id:'agprot',name:'Agama Protestan',col:'Agama Protestan',data:()=>AP},
   {id:'pjok',name:'PJOK',col:'PJOK',data:()=>M.map(s=>[...s,0])},
   {id:'prak',name:'Prakarya',col:'Prakarya',data:()=>M.map(s=>[...s,0])},
   {id:'tik',name:'TIK',col:'TIK',data:()=>M.map(s=>[...s,0])}
@@ -1362,7 +1539,7 @@ function savePengumuman(){
 }
 function downloadAllData(){
   const allData={
-    bindo:BI, agkat:AK, bing:BG, PKn:PK, IPA:PA, agisl:AI, userpass:UP,
+    bindo:BI, agkat:AK, bing:BG, PKn:PK, IPA:PA, agisl:AI, aprot:Ap, mtk:MT,userpass:UP,
     pengumuman:getPengumuman(),
     accessCount:getAccessCount(),
     exportedAt:new Date().toISOString()
@@ -1384,7 +1561,11 @@ function importAllData(input){
       if(data.agkat&&Array.isArray(data.bing)){BG.length=0;data.agkat.forEach(d=>BG.push(d));count++}
       if(data.agkat&&Array.isArray(data.agkat)){PK.length=0;data.agkat.forEach(d=>PK.push(d));count++}
       if(data.agkat&&Array.isArray(data.agkat)){PA.length=0;data.agkat.forEach(d=>PA.push(d));count++}
-      if(data.agkat&&Array.isArray(data.agkat)){AI.length=0;data.agkat.forEach(d=>AI.push(d));count++}    
+      if(data.agkat&&Array.isArray(data.agkat)){AI.length=0;data.agkat.forEach(d=>AI.push(d));count++} 
+      if(data.agkat&&Array.isArray(data.agkat)){MT.length=0;data.agkat.forEach(d=>MT.push(d));count++} 
+      if(data.agkat&&Array.isArray(data.agkat)){AP.length=0;data.agkat.forEach(d=>AP.push(d));count++}  
+
+
       if(data.userpass&&Array.isArray(data.userpass)){UP.length=0;data.userpass.forEach(d=>UP.push(d));count++}
       if(data.pengumuman)setPengumuman(data.pengumuman);
       if(data.accessCount!==undefined)localStorage.setItem('sts_access_count',''+data.accessCount);
