@@ -1082,6 +1082,256 @@ KS9B0020013|NADYA HOEKOEBOEN|78
 KS9B0020015|RAHEL M TARANTEIN|78
 KS9B0020020|ZULKIFLI RAHAKBAUW|51`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
 
+// PJOK (123 siswa)
+const PJ=`KS7A0020001|Agustina Martha Jalnuhubun|63
+KS7A0020002|Alexa Sherryl Jabar|77
+KS7A0020003|Billyand Noah Putra Gaga|52
+KS7A0020004|Apolinaris Kelanit|64
+KS7A0020005|Aprilia Ela Sirwutubun|39
+KS7A0020006|Arlinda Metubun|36
+KS7A0020007|Bois Alfa Ngutra|45
+KS7A0020008|Dewi Putri Madubun|60
+KS7A0020009|Elagren Marlatu Lukas Madubun|20
+KS7A0020010|Fillano Pedrosa Masbaitubun|53
+KS7A0020011|Gracia Viona Yanyaan|33
+KS7A0020012|Johanes Obet Bertkat|56
+KS7A0020013|Jonathan Alvaro Moriolkosu|77
+KS7A0020014|Katarina Rumangun|0
+KS7A0020015|Maria Ayu Paisa|57
+KS7A0020016|Maria Syelena Suripatty Esomar|69
+KS7A0020017|Maria Theresia Rumangun|65
+KS7A0020018|Marlina Ingke Balriyanan|61
+KS7A0020019|Menci Elsina Fantri Karatem|70
+KS7A0020020|Oktovianus Jamrevav|52
+KS7A0020021|Reza Dwi Eirlangga Jamlean|0
+KS7A0020022|Steven Arnold Laumualy|39
+KS7A0020023|Yohana T Resubun|63
+KS7B0020001|Agnes Adriana Tawain.|52
+KS7B0020002|Allmendo Xavi Remetwa.|54
+KS7B0020003|Alexander Simon Vatubun.|36
+KS7B0020004|Aroby Tamher|63
+KS7B0020005|Aprilia Lidwina Welikin|53
+KS7B0020006|Blasius Paskal Dewaut|54
+KS7B0020007|Chaylen Manis Koedoeboen|39
+KS7B0020008|Firman Tanarubun|41
+KS7B0020009|Herlina Abarua|48
+KS7B0020010|Julius Marzelino Fadirubun|51
+KS7B0020011|Jumadi Tamher|43
+KS7B0020012|Kanisius Kebubun|0
+KS7B0020013|Mintje Glorya Balubun|58
+KS7B0020014|Margaretha Futubun|40
+KS7B0020015|Mikha Desire Rukait|59
+KS7B0020016|Mawar Sharon Kirwelakubun|78
+KS7B0020017|Nahla Abidin Rahakratat|47
+KS7B0020018|Penina Rumangun|69
+KS7B0020019|Rafail Rengur|61
+KS7B0020020|Udeta Insoraki Rumyaan|24
+KS7B0020021|Yosep L Takerubun|41
+KS7B0020022|Maria A. Heatubun|29
+KS8A0020001|Alinda Ode|65
+KS8A0020002|Andreas Balubun|30
+KS8A0020003|Benedicta Petra Akbar|50
+KS8A0020004|Carolus B. Varis Wemaf|49
+KS8A0020005|Everets Jiffy Gattu|76
+KS8A0020006|Gregorius Higuen Balubun|74
+KS8A0020007|Johanis Charles Woersok|0
+KS8A0020008|Maria Gratia Maturbongs|0
+KS8A0020009|Yoseph Erlangga Lamere|83
+KS8A0020010|Klementina Fernatyanan|54
+KS8A0020011|Mediana Aziera Jeujanan|87
+KS8A0020012|Rahmatia Bugis|59
+KS8A0020013|Reinal Moriolkosu|79
+KS8A0020014|Shalmon Antony Rahangmetan|87
+KS8A0020015|Vinsensius Edoardus Balubun|47
+KS8A0020016|Welhelmus Zyerzeven Ngarbingan|50
+KS8A0020017|Ronal Regen Rahayaan|49
+KS8A0020018|Harita F. Laritmas|52
+KS8A0020019|Gracia F. Meterai|0
+KS8A0020020|Revandi Mukujei|48
+KS8B0020001|adriana theresia rahabav|63
+KS8B0020002|Christ Noel Desandro Emyu Souhoka|89
+KS8B0020003|Dewanti Sari Jamlean|49
+KS8B0020004|Fabiano B. S. Janjaan|36
+KS8B0020005|Gabriella Ernesta K. Kanarubun|64
+KS8B0020006|Gregorius Higuen Balubun|43
+KS8B0020007|Johanis Charles Woersok|67
+KS8B0020008|Maria Gratia Maturbongs|73
+KS8B0020009|Michael Joseph Masbaitubun|76
+KS8B0020010|Oksen Petrus Letsoin|70
+KS8B0020011|Paulina Chelsie Renwarin|62
+KS8B0020012|Restha Jenifer Rahanra|59
+KS8B0020013|Wensislaus Eko Wemaf|48
+KS8B0020014|FILIO EMANUEL FAR-FAR|71
+KS8B0020015|SYANE SELFI RAHANGMETAN|69
+KS8B0020016|MARIA STEFANI ATBAR|69
+KS8B0020017|Ronal Regen Rahayaan|0
+KS8B0020018|Marwan R. Rahayaan|47
+KS9A0020001|ADRIANUS RAHANAU|46
+KS9A0020002|ADRIEL CALVINO RENWARIN|61
+KS9A0020003|AMOS RISAL OILIRA|52
+KS9A0020004|DIANA HERMINA HUAWAE|60
+KS9A0020005|VIRGYLIUS M.Y. LEFTUNGUN|51
+KS9A0020006|GIDION LEFTA|43
+KS9A0020007|INTAN RAHAKBAUW|71
+KS9A0020008|KEANO MACKENZIE RAHAJAAN|51
+KS9A0020009|LEONTINA JEUJANAN|70
+KS9A0020010|MARCELINO ALDO RENYAAN|53
+KS9A0020011|MARIA MUTIARA WARAT|58
+KS9A0020012|MELATI AUREL ROSYADI|53
+KS9A0020013|MICHAELA P. D. TAPOTUBUN|73
+KS9A0020014|NILAM MARSDA WABULA|52
+KS9A0020015|ROBBEN JAKOBUS OHOILEDJAAN|0
+KS9A0020016|ROSNATA PUSPITA RENWARIN|20
+KS9A0020017|WELHELMUS RUMANGUN|59
+KS9A0020018|WIDY CLEANDRA AZAZYA JABAR|74
+KS9A0020019|WILIN NOTANUBUN|68
+KS9A0020020|LANA RIECEL LABOBAR|55
+KS9B0020001|ANDREAS LORENZO TAKERUBUN|61
+KS9B0020002|ALFONSINA OHOIULUN|50
+KS9B0020003|AZAN AKBAR TUKLOY|0
+KS9B0020004|BERNADETA SIAHAYA|56
+KS9B0020005|DINDA PELANGI RENHORAN|75
+KS9B0020006|INTAN MASAHIDA|74
+KS9B0020007|ISRAEL. ABRISYE LABETUBUN|52
+KS9B0020008|KRISTINA ANGRENI WELERUBUN|64
+KS9B0020009|MARIANUS NGARBINGAN|0
+KS9B0020010|MARTHA MELSASAIL|65
+KS9B0020011|MUSA EFRUAN|55
+KS9B0020012|MARIA BIN METURAN|64
+KS9B0020013|NADYA HOEKOEBOEN|69
+KS9B0020014|RONI ANGGARA RAWULUNUBUN|0
+KS9B0020015|RAHEL M TARANTEIN|62
+KS9B0020016|SANDRA JEKLIN FARYO|47
+KS9B0020017|YOHANIS MESI EFRUAN|40
+KS9B0020018|YOHANIS MARVEL JAMREVAV|43
+KS9B0020019|WILHELMUS RAHALOB|0
+KS9B0020020|ZULKIFLI RAHAKBAUW|44`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
+
+// IPS (123 siswa)
+const IP=`KS7A0020001|Agustina Martha Jalnuhubun|81
+KS7A0020002|Alexa Sherryl Jabar|81
+KS7A0020003|Billyand Noah Putra Gaga|75
+KS7A0020004|Apolinaris Kelanit|68
+KS7A0020005|Aprilia Ela Sirwutubun|64
+KS7A0020006|Arlinda Metubun|72
+KS7A0020007|Bois Alfa Ngutra|62
+KS7A0020008|Dewi Putri Madubun|82
+KS7A0020009|Elagren Marlatu Lukas Madubun|41
+KS7A0020010|Fillano Pedrosa Masbaitubun|65
+KS7A0020011|Gracia Viona Yanyaan|44
+KS7A0020012|Johanes Obet Bertkat|70
+KS7A0020013|Jonathan Alvaro Moriolkosu|71
+KS7A0020014|Katarina Rumangun|0
+KS7A0020015|Maria Ayu Paisa|67
+KS7A0020016|Maria Syelena Suripatty Esomar|62
+KS7A0020017|Maria Theresia Rumangun|81
+KS7A0020018|Marlina Ingke Balriyanan|65
+KS7A0020019|Menci Elsina Fantri Karatem|71
+KS7A0020020|Oktovianus Jamrevav|41
+KS7A0020021|Reza Dwi Eirlangga Jamlean|0
+KS7A0020022|Steven Arnold Laumualy|65
+KS7A0020023|Yohana T Resubun|86
+KS7B0020001|Agnes Adriana Tawain.|66
+KS7B0020002|Allmendo Xavi Remetwa.|83
+KS7B0020003|Alexander Simon Vatubun.|35
+KS7B0020004|Aroby Tamher|55
+KS7B0020005|Aprilia Lidwina Welikin|76
+KS7B0020006|Blasius Paskal Dewaut|56
+KS7B0020007|Chaylen Manis Koedoeboen|69
+KS7B0020008|Firman Tanarubun|44
+KS7B0020009|Herlina Abarua|77
+KS7B0020010|Julius Marzelino Fadirubun|70
+KS7B0020011|Jumadi Tamher|35
+KS7B0020012|Kanisius Kebubun|0
+KS7B0020013|Mintje Glorya Balubun|77
+KS7B0020014|Margaretha Futubun|33
+KS7B0020015|Mikha Desire Rukait|89
+KS7B0020016|Mawar Sharon Kirwelakubun|81
+KS7B0020017|Nahla Abidin Rahakratat|87
+KS7B0020018|Penina Rumangun|71
+KS7B0020019|Rafail Rengur|64
+KS7B0020020|Udeta Insoraki Rumyaan|58
+KS7B0020021|Yosep L Takerubun|60
+KS7B0020022|Maria A. Heatubun|49
+KS8A0020001|Alinda Ode|89
+KS8A0020002|Andreas Balubun|49
+KS8A0020003|Benedicta Petra Akbar|83
+KS8A0020004|Carolus B. Varis Wemaf|22
+KS8A0020005|Everets Jiffy Gattu|62
+KS8A0020006|Gregorius Higuen Balubun|63
+KS8A0020007|Johanis Charles Woersok|0
+KS8A0020008|Maria Gratia Maturbongs|0
+KS8A0020009|Yoseph Erlangga Lamere|43
+KS8A0020010|Klementina Fernatyanan|56
+KS8A0020011|Mediana Aziera Jeujanan|77
+KS8A0020012|Rahmatia Bugis|56
+KS8A0020013|Reinal Moriolkosu|55
+KS8A0020014|Shalmon Antony Rahangmetan|36
+KS8A0020015|Vinsensius Edoardus Balubun|58
+KS8A0020016|Welhelmus Zyerzeven Ngarbingan|28
+KS8A0020017|Ronal Regen Rahayaan|26
+KS8A0020018|Harita F. Laritmas|44
+KS8A0020019|Gracia F. Meterai|0
+KS8A0020020|Revandi Mukujei|20
+KS8B0020001|adriana theresia rahabav|58
+KS8B0020002|Christ Noel Desandro Emyu Souhoka|84
+KS8B0020003|Dewanti Sari Jamlean|63
+KS8B0020004|Fabiano B. S. Janjaan|43
+KS8B0020005|Gabriella Ernesta K. Kanarubun|53
+KS8B0020006|Gregorius Higuen Balubun|60
+KS8B0020007|Johanis Charles Woersok|43
+KS8B0020008|Maria Gratia Maturbongs|63
+KS8B0020009|Michael Joseph Masbaitubun|74
+KS8B0020010|Oksen Petrus Letsoin|44
+KS8B0020011|Paulina Chelsie Renwarin|51
+KS8B0020012|Restha Jenifer Rahanra|43
+KS8B0020013|Wensislaus Eko Wemaf|35
+KS8B0020014|FILIO EMANUEL FAR-FAR|33
+KS8B0020015|SYANE SELFI RAHANGMETAN|54
+KS8B0020016|MARIA STEFANI ATBAR|71
+KS8B0020017|Ronal Regen Rahayaan|0
+KS8B0020018|Marwan R. Rahayaan|18
+KS9A0020001|ADRIANUS RAHANAU|59
+KS9A0020002|ADRIEL CALVINO RENWARIN|86
+KS9A0020003|AMOS RISAL OILIRA|32
+KS9A0020004|DIANA HERMINA HUAWAE|94
+KS9A0020005|VIRGYLIUS M.Y. LEFTUNGUN|96
+KS9A0020006|GIDION LEFTA|55
+KS9A0020007|INTAN RAHAKBAUW|100
+KS9A0020008|KEANO MACKENZIE RAHAJAAN|96
+KS9A0020009|LEONTINA JEUJANAN|98
+KS9A0020010|MARCELINO ALDO RENYAAN|85
+KS9A0020011|MARIA MUTIARA WARAT|95
+KS9A0020012|MELATI AUREL ROSYADI|100
+KS9A0020013|MICHAELA P. D. TAPOTUBUN|100
+KS9A0020014|NILAM MARSDA WABULA|92
+KS9A0020015|ROBBEN JAKOBUS OHOILEDJAAN|0
+KS9A0020016|ROSNATA PUSPITA RENWARIN|43
+KS9A0020017|WELHELMUS RUMANGUN|95
+KS9A0020018|WIDY CLEANDRA AZAZYA JABAR|92
+KS9A0020019|WILIN NOTANUBUN|95
+KS9A0020020|LANA RIECEL LABOBAR|94
+KS9B0020001|ANDREAS LORENZO TAKERUBUN|96
+KS9B0020002|ALFONSINA OHOIULUN|59
+KS9B0020003|AZAN AKBAR TUKLOY|0
+KS9B0020004|BERNADETA SIAHAYA|84
+KS9B0020005|DINDA PELANGI RENHORAN|95
+KS9B0020006|INTAN MASAHIDA|100
+KS9B0020007|ISRAEL. ABRISYE LABETUBUN|46
+KS9B0020008|KRISTINA ANGRENI WELERUBUN|98
+KS9B0020009|MARIANUS NGARBINGAN|0
+KS9B0020010|MARTHA MELSASAIL|74
+KS9B0020011|MUSA EFRUAN|98
+KS9B0020012|MARIA BIN METURAN|87
+KS9B0020013|NADYA HOEKOEBOEN|96
+KS9B0020014|RONI ANGGARA RAWULUNUBUN|0
+KS9B0020015|RAHEL M TARANTEIN|100
+KS9B0020016|SANDRA JEKLIN FARYO|79
+KS9B0020017|YOHANIS MESI EFRUAN|48
+KS9B0020018|YOHANIS MARVEL JAMREVAV|45
+KS9B0020019|WILHELMUS RAHALOB|0
+KS9B0020020|ZULKIFLI RAHAKBAUW|55`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
+
 // Data Username & Password (123 siswa)
 const UP=`KS7A0020001|Agustina Martha Jalnuhubun|7A020001
 KS7A0020002|Alexa Sherryl Jabar|7A020002
@@ -1214,17 +1464,17 @@ const SUBJECTS=[
   {id:'bing',name:'Bahasa Iggris',col:'Bahasa Iggris',data:()=>BG},
   {id:'pkn',name:'PKn',col:'pkN',data:()=>PK},
   {id:'ipa',name:'IPA',col:'IPA',data:()=>PA},  
-  {id:'ips',name:'IPS',col:'IPS',data:()=>M.map(s=>[...s,0])},
+  {id:'ips',name:'IPS',col:'IPS',data:()=>IP},
   {id:'agisl',name:'Agama Islam',col:'Agama Islam',data:()=>AI},
   {id:'mtk',name:'Matematika',col:'Matematika',data:()=>MT},
   {id:'agprot',name:'Agama Protestan',col:'Agama Protestan',data:()=>AP},
-  {id:'pjok',name:'PJOK',col:'PJOK',data:()=>M.map(s=>[...s,0])},
+  {id:'pjok',name:'PJOK',col:'PJOK',data:()=>PJ},
   {id:'prak',name:'Prakarya',col:'Prakarya',data:()=>M.map(s=>[...s,0])},
   {id:'tik',name:'TIK',col:'TIK',data:()=>M.map(s=>[...s,0])}
 ];
 
 const LOGO_URL='https://lh3.googleusercontent.com/d/18-fVQ1HqVhduTzsYSxFj6PqJop4ifDru';
-const JADWAL_URL='https://lh3.googleusercontent.com/d/1JZEbdhmvNZyzV5jskjv46yVCpZuouJlM';
+const JADWAL_URL='https://lh3.googleusercontent.com/d/1YVLw8KWXqCf8Ai0wq3N8zvOJTcTyCXe9';
 const DEFAULT_PENGUMUMAN='Jangan lupa subscribe YouTube Channel SMP Karel Sadsuitubun. Ujian OSN akan disiarkan secara live melalui YouTube. Saksikan dan dukung bersama. Jadwal Ujian OSN akan disampaikan kemudian. Terima kasih.';
 
 /* ===================== STATE ===================== */
@@ -1539,7 +1789,7 @@ function savePengumuman(){
 }
 function downloadAllData(){
   const allData={
-    bindo:BI, agkat:AK, bing:BG, PKn:PK, IPA:PA, agisl:AI, aprot:Ap, mtk:MT,userpass:UP,
+    bindo:BI, agkat:AK, bing:BG, PKn:PK, IPA:PA, agisl:AI, aprot:Ap, mtk:MT, pjok:PJ, ips:IP, userpass:UP,
     pengumuman:getPengumuman(),
     accessCount:getAccessCount(),
     exportedAt:new Date().toISOString()
@@ -1564,7 +1814,8 @@ function importAllData(input){
       if(data.agkat&&Array.isArray(data.agkat)){AI.length=0;data.agkat.forEach(d=>AI.push(d));count++} 
       if(data.agkat&&Array.isArray(data.agkat)){MT.length=0;data.agkat.forEach(d=>MT.push(d));count++} 
       if(data.agkat&&Array.isArray(data.agkat)){AP.length=0;data.agkat.forEach(d=>AP.push(d));count++}  
-
+      if(data.agkat&&Array.isArray(data.agkat)){PJ.length=0;data.agkat.forEach(d=>AP.push(d));count++}
+      if(data.agkat&&Array.isArray(data.agkat)){IP.length=0;data.agkat.forEach(d=>AP.push(d));count++}
 
       if(data.userpass&&Array.isArray(data.userpass)){UP.length=0;data.userpass.forEach(d=>UP.push(d));count++}
       if(data.pengumuman)setPengumuman(data.pengumuman);
