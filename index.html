@@ -1,2022 +1,930 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SMP Karel Sadsuitubun - Sistem STS</title>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<style>
-:root{
---primary:#0d47a1;--primary-m:#1565c0;--primary-l:#42a5f5;--accent:#00acc1;
---bg:#e8f0fe;--card:#fff;--text:#0d1b3e;--muted:#5a6a85;--border:#c5d5ea;
---success:#1b8a3d;--danger:#c62828;--warning:#e65100;
---sidebar:#0a2e6e;--sidebar-h:#123d8a;--sidebar-t:#d6e8ff;
---radius:10px;--shadow:0 2px 16px rgba(10,46,110,.07);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{font-size:15px;scroll-behavior:smooth}
-body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var(--bg);min-height:100vh;overflow-x:hidden}
-h1,h2,h3,h4{font-family:'Sora',sans-serif;font-weight:700;color:var(--primary)}
-/* ===== LOGIN LAYOUT (SPLIT SCREEN) ===== */
-#loginPage{
-  display:flex;flex-direction:row;
-  height:100vh;width:100vw;overflow:hidden;
-  margin:0;padding:0;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Penilaian SMP Karel Sadsuitubun</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <style>
+        :root { --primary: #0056b3; --secondary: #e3f2fd; --text: #333; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f4f7f6; color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+        
+        /* LOGIN */
+        #login-view { display: flex; flex-direction: column; width: 100%; height: 100%; background: #fff; }
+        .login-top { flex: 1; display: flex; }
+        .login-left { flex: 1; background: url('https://lh3.googleusercontent.com/d/1sZ32heYk0hSofyD0F5Fq0jRhFg5JfMhY') center/cover no-repeat; }
+        .login-right { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; background: var(--secondary); }
+        .login-form { width: 100%; max-width: 350px; text-align: center; }
+        .login-form img { width: 90px; margin-bottom: 20px; border-radius: 50%; border: 3px solid var(--primary); }
+        .login-form h2 { color: var(--primary); margin-bottom: 10px; }
+        .login-form input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; }
+        .login-form button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .login-form button:hover { background: #004494; }
+        #login-error { color: red; display: none; margin-top: 10px; font-size: 14px; }
+        .login-bottom { background: var(--primary); color: white; text-align: center; padding: 15px; font-size: 14px; }
+        .login-bottom a { color: #ffd700; font-weight: bold; text-decoration: none; }
 
-/* Kiri: Gambar */
-.login-left{
-  flex:1;
-  display:flex;align-items:center;justify-content:center;
-  background-color:#f8f9fa; /* Latar belakang terang agar gambar menonjol */
-  padding:40px;
-  position:relative;
-}
-.login-left img{
-  max-width:100%;
-  max-height:90vh;
-  object-fit:contain; /* Agar gambar tidak gepeng */
-  border-radius:12px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.08);
-  animation:fadeInLeft 0.8s ease-out;
-}
+        /* MAIN APP */
+        #app-view { display: none; width: 100%; height: 100%; }
+        .sidebar { width: 260px; background: var(--primary); color: white; height: 100vh; overflow-y: auto; transition: 0.3s; position: fixed; z-index: 100; }
+        .sidebar.hide { left: -260px; }
+        .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2); }
+        .sidebar-header img { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid white; }
+        .sidebar-header h3 { margin-top: 10px; font-size: 14px; text-transform: uppercase; }
+        
+        .menu-item { padding: 12px 20px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; font-size: 14px; }
+        .menu-item:hover, .menu-item.active { background: rgba(255,255,255,0.2); }
+        .menu-item i { margin-right: 10px; width: 20px; text-align: center; }
+        .sub-menu { display: none; background: rgba(0,0,0,0.1); }
+        .sub-menu .menu-item { padding-left: 40px; font-size: 13px; }
+        .menu-item.toggle-sub + .sub-menu.show { display: block; }
 
-/* Kanan: Form */
-.login-right{
-  flex:1;
-  display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,#0a2e6e 0%,#1565c0 50%,#0d47a1 100%);
-  position:relative;overflow:hidden;
-  padding:20px;
-}
+        .main-content { margin-left: 260px; flex: 1; display: flex; flex-direction: column; overflow: hidden; width: calc(100% - 260px); transition: 0.3s; }
+        .main-content.full { margin-left: 0; width: 100%; }
+        
+        .topbar { background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 50; }
+        .topbar-left { display: flex; align-items: center; gap: 15px; }
+        .topbar-right { display: flex; align-items: center; gap: 15px; }
+        .toggle-btn { font-size: 20px; cursor: pointer; color: var(--primary); }
+        .topbar-right i { font-size: 20px; color: var(--primary); cursor: pointer; }
+        .btn-logout { padding: 6px 15px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        
+        .content-area { padding: 20px; overflow-y: auto; flex: 1; background: #f4f7f6; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; border-top: 4px solid var(--primary); }
+        .card h3 { margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid var(--secondary); padding-bottom: 5px; display:flex; align-items:center; gap:10px;}
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: var(--primary); color: white; position: sticky; top: 0; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        input, select, textarea { width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 8px 15px; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; margin: 2px; font-size: 13px; }
+        button:hover { background: #004494; }
+        .btn-danger { background: #dc3545; }
+        .btn-success { background: #28a745; }
+        .btn-warning { background: #ffc107; color: #333; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .uspw-card { border: 1px solid #ddd; padding: 15px; border-radius: 6px; background: #f8f9fa; text-align: center; }
+        .uspw-card h4 { color: var(--primary); font-size: 14px; margin-bottom: 5px; }
+        
+        .cam-container { width: 100%; max-width: 350px; margin: 0 auto; background: #000; border-radius: 8px; overflow: hidden; }
+        video { width: 100%; display: block; }
 
-/* Animasi Blob (Tetap di Kanan) */
-.login-blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.18;animation:blobFloat 8s ease-in-out infinite}
-.login-blob:nth-child(1){width:320px;height:320px;background:#00acc1;top:-60px;left:-80px}
-.login-blob:nth-child(2){width:260px;height:260px;background:#42a5f5;bottom:-40px;right:-60px;animation-delay:3s}
-.login-blob:nth-child(3){width:200px;height:200px;background:#80deea;top:40%;left:60%;animation-delay:5s}
+        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px; }
 
-@keyframes blobFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.05)}66%{transform:translate(-20px,15px) scale(.95)}}
-@keyframes fadeInLeft{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
-
-.login-card{background:rgba(255,255,255,.95);backdrop-filter:blur(20px);border-radius:18px;padding:36px 32px;width:92%;max-width:400px;box-shadow:0 16px 48px rgba(0,0,0,.25);position:relative;z-index:2;animation:fadeUp .5s ease}
-.login-card .logo-img{width:90px;height:90px;border-radius:14px;object-fit:contain;margin:0 auto 12px;display:block;background:#f0f5ff}
-.login-card h2{text-align:center;font-size:1.15rem;margin-bottom:4px}
-.login-card .sub{text-align:center;color:var(--muted);font-size:.82rem;margin-bottom:22px}
-.form-group{margin-bottom:16px}
-.form-group label{display:block;font-size:.78rem;font-weight:600;margin-bottom:5px;color:var(--primary)}
-.form-group input{width:100%;padding:10px 12px 10px 38px;border:1.5px solid var(--border);border-radius:8px;font-size:.9rem;font-family:inherit;transition:.2s;background:#f8faff}
-.form-group input:focus{outline:none;border-color:var(--primary-l);box-shadow:0 0 0 3px rgba(66,165,245,.15)}
-.form-group .input-wrap{position:relative}
-.form-group .input-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.85rem}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border:none;border-radius:8px;font-size:.85rem;font-weight:600;font-family:inherit;cursor:pointer;transition:.2s}
-.btn:active{transform:scale(.97)}
-.btn-primary{background:var(--primary);color:#fff}
-.btn-primary:hover{background:var(--primary-m)}
-.btn-success{background:var(--success);color:#fff}
-.btn-success:hover{background:#15732f}
-.btn-danger{background:var(--danger);color:#fff}
-.btn-danger:hover{background:#a11b1b}
-.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--primary)}
-.btn-outline:hover{background:var(--bg)}
-.btn-sm{padding:6px 14px;font-size:.78rem}
-.btn-full{width:100%}
-.btn:disabled{opacity:.5;cursor:not-allowed}
-.login-btn{width:100%;padding:12px;font-size:.95rem;margin-top:6px;border-radius:10px}
-.yt-link{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:20px;padding:10px;background:#ff0000;color:#fff;border-radius:8px;text-decoration:none;font-size:.78rem;font-weight:600;transition:.2s}
-.yt-link:hover{background:#cc0000;transform:translateY(-1px)}
-.login-error{background:#fdecea;color:var(--danger);padding:8px 12px;border-radius:6px;font-size:.8rem;margin-bottom:12px;display:none}
-
-/* Responsive Login: Ubah ke layout vertikal di HP */
-@media(max-width: 768px){
-  #loginPage{flex-direction:column; overflow-y:auto;}
-  .login-left{flex:none; height:300px; align-items:center; padding:20px; background:#fff;}
-  .login-left img{max-height:100%; border-radius:0; box-shadow:none; margin-top:20px;}
-  .login-right{flex:1; min-height:calc(100vh - 300px); align-items:center; justify-content:center;}
-  .login-card{margin:0 auto; width:95%; padding:24px 20px;}
-}
-
-/* ===== MAIN APP ===== */
-#mainApp{display:none;min-height:100vh}
-.sidebar{position:fixed;top:0;left:0;width:250px;height:100vh;background:var(--sidebar);color:var(--sidebar-t);z-index:100;overflow-y:auto;transition:transform .3s;display:flex;flex-direction:column}
-.sidebar-header{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px}
-.sidebar-header img{width:38px;height:38px;border-radius:8px;object-fit:contain;background:#fff}
-.sidebar-header .app-title{font-family:'Sora';font-size:.85rem;font-weight:700;line-height:1.2}
-.sidebar-header .app-sub{font-size:.65rem;opacity:.7}
-.sidebar-nav{flex:1;padding:10px 0}
-.nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;font-size:.82rem;cursor:pointer;transition:.15s;border-left:3px solid transparent;color:var(--sidebar-t);text-decoration:none}
-.nav-item:hover{background:var(--sidebar-h);border-left-color:var(--primary-l)}
-.nav-item.active{background:var(--sidebar-h);border-left-color:var(--accent);color:#fff;font-weight:600}
-.nav-item i{width:18px;text-align:center;font-size:.9rem}
-.nav-sub{padding-left:18px}
-.nav-sub .nav-item{padding:8px 18px 8px 46px;font-size:.78rem;border-left:none}
-.nav-sub .nav-item.active{background:rgba(0,172,193,.15);color:#fff;border-left:none}
-.nav-sub-toggle{display:flex;align-items:center;gap:10px;padding:10px 18px;font-size:.82rem;cursor:pointer;transition:.15s;border-left:3px solid transparent;color:var(--sidebar-t)}
-.nav-sub-toggle:hover{background:var(--sidebar-h)}
-.nav-sub-toggle.active{border-left-color:var(--accent);color:#fff;font-weight:600}
-.nav-sub-toggle i.chevron{margin-left:auto;transition:transform .25s;font-size:.7rem}
-.nav-sub-toggle.open i.chevron{transform:rotate(90deg)}
-.nav-sub{max-height:0;overflow:hidden;transition:max-height .35s ease}
-.nav-sub.open{max-height:600px}
-.sidebar-footer{padding:14px 16px;border-top:1px solid rgba(255,255,255,.08)}
-.sidebar-footer .nav-item{padding:8px 0}
-/* Top bar */
-.topbar{position:fixed;top:0;left:250px;right:0;height:56px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:90;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.topbar-left{display:flex;align-items:center;gap:12px}
-.hamburger{display:none;background:none;border:none;font-size:1.2rem;color:var(--primary);cursor:pointer;padding:4px}
-.topbar-title{font-family:'Sora';font-size:.95rem;font-weight:700;color:var(--primary)}
-.topbar-right{display:flex;align-items:center;gap:12px}
-.topbar-right .user-badge{font-size:.75rem;color:var(--muted);background:var(--bg);padding:4px 10px;border-radius:6px}
-.topbar-right .btn-logout{font-size:.78rem}
-/* Content */
-.content{margin-left:250px;margin-top:56px;padding:24px;min-height:calc(100vh - 56px)}
-.page{display:none;animation:fadeUp .3s ease}
-.page.active{display:block}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-/* Cards */
-.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:18px;border:1px solid rgba(197,213,234,.4)}
-.card-title{font-size:.9rem;margin-bottom:14px;display:flex;align-items:center;gap:8px;color:var(--primary)}
-.card-title i{color:var(--primary-l)}
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:18px}
-.stat-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;display:flex;align-items:center;gap:14px;border:1px solid rgba(197,213,234,.4);position:relative;overflow:hidden}
-.stat-card::after{content:'';position:absolute;top:0;right:0;width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,rgba(66,165,245,.08),transparent);transform:translate(20px,-20px)}
-.stat-icon{width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
-.stat-icon.blue{background:linear-gradient(135deg,#e3f2fd,#bbdefb);color:var(--primary)}
-.stat-icon.teal{background:linear-gradient(135deg,#e0f7fa,#b2ebf2);color:var(--accent)}
-.stat-icon.green{background:linear-gradient(135deg,#e8f5e9,#c8e6c9);color:var(--success)}
-.stat-info .stat-label{font-size:.72rem;color:var(--muted);font-weight:500}
-.stat-info .stat-value{font-family:'Sora';font-size:1.5rem;font-weight:800;color:var(--primary);line-height:1.2}
-.stat-logo{width:60px;height:60px;border-radius:10px;object-fit:contain;margin-left:auto;flex-shrink:0;background:#f5f8ff}
-/* Pengumuman */
-.pengumuman-box{background:linear-gradient(135deg,#e3f2fd,#fff);border-left:4px solid var(--primary-l);border-radius:0 var(--radius) var(--radius) 0;padding:16px 18px;margin-bottom:16px}
-.pengumuman-box h4{font-size:.85rem;margin-bottom:6px;color:var(--primary)}
-.pengumuman-box p{font-size:.82rem;color:var(--text);line-height:1.6}
-.jadwal-img{max-width:100%;border-radius:8px;margin-top:10px;box-shadow:var(--shadow)}
-/* Tables */
-.table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border)}
-table{width:100%;border-collapse:collapse;font-size:.8rem}
-thead{background:var(--primary);color:#fff}
-th{padding:10px 12px;text-align:left;font-weight:600;white-space:nowrap}
-td{padding:8px 12px;border-bottom:1px solid #eef2f8}
-tbody tr:nth-child(even){background:#f5f8ff}
-tbody tr:hover{background:#e3f0ff}
-.score-high{color:var(--success);font-weight:700}
-.score-mid{color:var(--warning);font-weight:600}
-.score-low{color:var(--danger);font-weight:700}
-/* Search */
-.search-bar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
-.search-input{flex:1;min-width:200px;padding:9px 12px 9px 36px;border:1.5px solid var(--border);border-radius:8px;font-size:.83rem;font-family:inherit;background:#fff;position:relative}
-.search-wrap{position:relative;flex:1;min-width:200px}
-.search-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.8rem}
-.search-wrap input{width:100%;padding:9px 12px 9px 36px;border:1.5px solid var(--border);border-radius:8px;font-size:.83rem;font-family:inherit;background:#fff}
-.search-wrap input:focus{outline:none;border-color:var(--primary-l);box-shadow:0 0 0 3px rgba(66,165,245,.12)}
-/* Settings */
-.settings-logo{width:120px;height:120px;border-radius:14px;object-fit:contain;background:#f5f8ff;border:2px solid var(--border);margin-bottom:14px}
-.settings-section{margin-bottom:22px}
-.settings-section label{display:block;font-size:.78rem;font-weight:600;margin-bottom:6px;color:var(--primary)}
-.settings-section textarea{width:100%;min-height:100px;padding:10px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:.83rem;resize:vertical}
-.settings-section textarea:focus{outline:none;border-color:var(--primary-l)}
-.btn-group{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-/* Toast */
-.toast-container{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px}
-.toast{padding:12px 18px;border-radius:8px;font-size:.82rem;font-weight:500;color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.15);animation:toastIn .3s ease;display:flex;align-items:center;gap:8px;max-width:340px}
-.toast.success{background:#1b8a3d}
-.toast.error{background:#c62828}
-.toast.info{background:var(--primary)}
-@keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
-/* Overlay */
-.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:95}
-/* Responsive */
-@media(max-width:768px){
-.sidebar{transform:translateX(-100%)}
-.sidebar.open{transform:translateX(0)}
-.sidebar-overlay.open{display:block}
-.topbar{left:0}
-.content{margin-left:0;padding:16px}
-.hamburger{display:block}
-.stat-grid{grid-template-columns:1fr}
-.search-bar{flex-direction:column}
-.search-wrap{min-width:100%}
-.btn-group{flex-direction:column}
-.btn-group .btn{width:100%}
-.login-card{padding:28px 22px}
-}
-@media(min-width:769px) and (max-width:1024px){
-.sidebar{width:220px}
-.topbar{left:220px}
-.content{margin-left:220px}
-}
-/* Scrollbar */
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:#b0c4de;border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:#8aa8c8}
-/* Print */
-@media print{.sidebar,.topbar,.hamburger,.btn{display:none!important}.content{margin:0;padding:10px}}
-.hidden{display:none!important}
-</style>
+        @media (max-width: 768px) {
+            .login-left { display: none; }
+            .sidebar { left: -260px; }
+            .sidebar.show { left: 0; }
+            .main-content { margin-left: 0; width: 100%; }
+            .grid-2 { grid-template-columns: 1fr; }
+            table { font-size: 10px; }
+            th, td { padding: 4px; }
+        }
+    </style>
 </head>
 <body>
 
-<!-- Halaman Login -->
-<div id="loginPage">
-  <!-- Kiri: Gambar -->
-  <div class="login-left">
-    <!-- Menggunakan link direct drive agar gambar muncul jernih -->
-    <img src="https://lh3.googleusercontent.com/d/1sZ32heYk0hSofyD0F5Fq0jRhFg5JfMhY" alt="SMP Karel Sadsuitubun">
-  </div>
-  
-  <!-- Kanan: Form -->
-  <div class="login-right">
-    <div class="login-blob"></div><div class="login-blob"></div><div class="login-blob"></div>
-    <div class="login-card">
-      <img class="logo-img" src="https://lh3.googleusercontent.com/d/18-fVQ1HqVhduTzsYSxFj6PqJop4ifDru" alt="Logo" onerror="this.style.background='#dde8f8';this.alt='Logo SMP Karel Sadsuitubun'">
-      <h2>SMP Karel Sadsuitubun</h2>
-      <p class="sub">Sistem Penilaian STS</p>
-      <div class="login-error" id="loginError"></div>
-      <div class="form-group">
-        <label>Username</label>
-        <div class="input-wrap"><i class="fas fa-user"></i><input type="text" id="loginUser" placeholder="Masukkan username" autocomplete="off"></div>
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <div class="input-wrap"><i class="fas fa-lock"></i><input type="password" id="loginPass" placeholder="Masukkan password"></div>
-      </div>
-      <button class="btn btn-primary login-btn" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Masuk</button>
-      <a class="yt-link" href="https://www.youtube.com/@chanelsmpkarelsadsuitubun1605" target="_blank" rel="noopener">
-        <i class="fab fa-youtube"></i> YouTube Channel SMP Karel Sadsuitubun
-      </a>
+    <!-- LOGIN VIEW -->
+    <div id="login-view">
+        <div class="login-top">
+            <div class="login-left"></div>
+            <div class="login-right">
+                <div class="login-form">
+                    <img src="https://lh3.googleusercontent.com/d/18-fVQ1HqVhduTzsYSxFj6PqJop4ifDru" alt="Logo">
+                    <h2>SMP Karel Sadsuitubun</h2>
+                    <p>Aplikasi Karsa Cerdas TP 2025/2026</p>
+                    <input type="text" id="username" placeholder="Username">
+                    <input type="password" id="password" placeholder="Password">
+                    <button onclick="login()"><i class="fas fa-sign-in-alt"></i> MASUK</button>
+                    <p id="login-error">Username atau Password salah!</p>
+                </div>
+            </div>
+        </div>
+        <div class="login-bottom">
+            Pendaftaran SPMB Thn. 2026 : <a href="https://docs.google.com/forms/d/1aGr_Uk_q9dPL7aAYLqaOqOcCXpQCCqNh5gDQms7OeZ4/edit" target="_blank">Klik Disini</a>
+        </div>
     </div>
-  </div>
-</div>
 
-<!-- Aplikasi Utama -->
-<div id="mainApp">
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <img src="https://lh3.googleusercontent.com/d/18-fVQ1HqVhduTzsYSxFj6PqJop4ifDru" alt="Logo" onerror="this.style.background='#dde8f8'">
-      <div><div class="app-title">SMP Karel Sadsuitubun</div><div class="app-sub">Sistem Penilaian STS</div></div>
-    </div>
-    <nav class="sidebar-nav" id="sidebarNav"></nav>
-    <div class="sidebar-footer">
-      <div class="nav-item" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Keluar</div>
-    </div>
-  </aside>
-  <header class="topbar">
-    <div class="topbar-left">
-      <button class="hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-      <span class="topbar-title" id="topbarTitle">Dashboard</span>
-    </div>
-    <div class="topbar-right">
-      <span class="user-badge" id="userBadge"></span>
-      <button class="btn btn-outline btn-sm btn-logout" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Keluar</button>
-    </div>
-  </header>
-  <main class="content" id="contentArea"></main>
-</div>
+    <!-- APP VIEW -->
+    <div id="app-view">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="https://lh3.googleusercontent.com/d/18-fVQ1HqVhduTzsYSxFj6PqJop4ifDru" id="sidebar-logo">
+                <h3 id="sidebar-role">Administrator</h3>
+            </div>
+            
+            <div class="menu-item active" onclick="showPage('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
+            <div class="menu-item" onclick="showPage('data-siswa')"><i class="fas fa-users"></i> Data Siswa</div>
+            <div class="menu-item" onclick="showPage('us-pw')"><i class="fas fa-id-card"></i> US-PW</div>
+            
+            <div class="menu-item toggle-sub" onclick="toggleSub(this)"><i class="fas fa-qrcode"></i> QR-Code <i class="fas fa-caret-down" style="margin-left:auto"></i></div>
+            <div class="sub-menu">
+                <div class="menu-item" onclick="showPage('qr-siswa')"><i class="fas fa-user"></i> QR Siswa</div>
+                <div class="menu-item" id="m-wajah-guru" onclick="showPage('wajah-guru')"><i class="fas fa-user-tie"></i> Wajah Guru</div>
+            </div>
 
-<!-- Toast -->
-<div class="toast-container" id="toastContainer"></div>
+            <div class="menu-item toggle-sub" onclick="toggleSub(this)"><i class="fas fa-fingerprint"></i> Absensi <i class="fas fa-caret-down" style="margin-left:auto"></i></div>
+            <div class="sub-menu">
+                <div class="menu-item" onclick="showPage('absen-siswa')"><i class="fas fa-user-check"></i> Absen Siswa</div>
+                <div class="menu-item" id="m-absen-guru" onclick="showPage('absen-guru')"><i class="fas fa-chalkboard-teacher"></i> Absen Guru</div>
+            </div>
+
+            <div class="menu-item toggle-sub" onclick="toggleSub(this)"><i class="fas fa-clipboard-list"></i> Hasil Absensi <i class="fas fa-caret-down" style="margin-left:auto"></i></div>
+            <div class="sub-menu">
+                <div class="menu-item" onclick="showPage('hasil-siswa')"><i class="fas fa-user"></i> Hasil Siswa</div>
+                <div class="menu-item" id="m-riwayat-guru" onclick="showPage('hasil-guru')"><i class="fas fa-user-tie"></i> Riwayat Guru</div>
+            </div>
+
+            <div class="menu-item toggle-sub" onclick="toggleSub(this)"><i class="fas fa-file-alt"></i> Hasil Tengah Semester <i class="fas fa-caret-down" style="margin-left:auto"></i></div>
+            <div class="sub-menu" id="menu-hts"></div>
+
+            <div class="menu-item toggle-sub" onclick="toggleSub(this)"><i class="fas fa-file-signature"></i> Hasil Semester <i class="fas fa-caret-down" style="margin-left:auto"></i></div>
+            <div class="sub-menu" id="menu-hs"></div>
+
+            <div class="menu-item" id="m-pengaturan" onclick="showPage('pengaturan')"><i class="fas fa-cogs"></i> Pengaturan</div>
+        </div>
+
+        <div class="main-content" id="main-content">
+            <div class="topbar">
+                <div class="topbar-left">
+                    <i class="fas fa-bars toggle-btn" onclick="toggleSidebar()"></i>
+                    <h3 id="page-title">Dashboard</h3>
+                </div>
+                <div class="topbar-right">
+                    <i class="fas fa-camera" onclick="openScanner()" title="Scan QR Absen" style="font-size:22px;"></i>
+                    <span id="user-display" style="font-weight:bold; color:var(--primary);"></span>
+                    <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- DASHBOARD -->
+                <div id="page-dashboard" class="page">
+                    <div class="grid-2">
+                        <div class="card" style="display:flex; align-items:center; gap:15px;">
+                            <img src="https://lh3.googleusercontent.com/d/18-fVQ1HqVhduTzsYSxFj6PqJop4ifDru" style="width:60px; height:60px; border-radius:50%;">
+                            <div>
+                                <h2 style="color:var(--primary); margin:0;" id="dash-total-pd">0</h2>
+                                <p style="margin:0;">Total Peserta Didik</p>
+                            </div>
+                        </div>
+                        <div class="card" style="text-align:center;">
+                            <h2 style="color:var(--primary); margin:0;" id="dash-total-uspw">0</h2>
+                            <p style="margin:0;">Jumlah US-PW</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3><i class="fas fa-bullhorn"></i> Pengumuman</h3>
+                        <p id="dash-pengumuman" style="background:var(--secondary); padding:10px; border-left:4px solid var(--primary); border-radius:4px;"></p>
+                    </div>
+
+                    <div class="card">
+                        <h3>Selamat Datang di Aplikasi Penilaian SMP Karel Sadsuitubun Tahun Pelajaran 2025/2026</h3>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="card" style="text-align:center;">
+                            <div style="text-align:center; margin:20px 0;">
+                                <a href="https://docs.google.com/forms/d/1aGr_Uk_q9dPL7aAYLqaOqOcCXpQCCqNh5gDQms7OeZ4/edit" 
+                                    target="_blank"
+                                    style="
+                                                display:inline-block;
+                                                padding:15px 25px;
+                                                background:#0d6efd;
+                                                color:white;
+                                                text-decoration:none;
+                                                border-radius:10px;
+                                                font-size:      16px;
+                                                font-weight:bold;
+                                                box-shadow:0 4px 8px rgba(0,0,0,0.2);
+                                                transition:0.3s;
+                                        "
+                                        onmouseover="this.style.background='#084298'"
+                                        onmouseout="this.style.background='#0d6efd'">
+                                        
+                                    <i class="fas fa-external-link-alt"></i>
+                                    Link Pendaftaran SPMB Tahun 2026
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card" style="text-align:center;">
+                            <img src="https://lh3.googleusercontent.com/d/1-sFHutdKmdKcIqYRN--SlJ4OpWNbPMXU" style="max-width:100%; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.1);">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DATA SISWA -->
+                <div id="page-data-siswa" class="page" style="display:none;">
+                    <div class="card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:10px;">
+                            <input type="text" id="src-siswa" placeholder="Cari Nama/NISN..." onkeyup="renderSiswa()" style="width:auto; flex:1; margin-right:10px;">
+                            <select id="filter-kelas" onchange="renderSiswa()" style="width:auto; padding:9px;">
+                                <option value="">Semua Kelas</option>
+                                <option value="7A">7A</option><option value="7B">7B</option>
+                                <option value="8A">8A</option><option value="8B">8B</option>
+                                <option value="9A">9A</option><option value="9B">9B</option>
+                            </select>
+                            <button id="btn-dl-siswa" class="btn-success" onclick="exportExcel('Data Siswa', 'tbl-siswa')"><i class="fas fa-download"></i> Download</button>
+                        </div>
+                        <div style="overflow-x:auto;">
+                            <table id="tbl-siswa">
+                                <thead><tr><th>No</th><th>Nama</th><th>NISN</th><th>Agama</th><th>Tempat Lahir</th><th>Tanggal Lahir</th><th>Kelas</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- US-PW -->
+                <div id="page-us-pw" class="page" style="display:none;">
+                    <div class="card">
+                        <h3><i class="fas fa-id-card"></i> Data US-PW</h3>
+                        <input type="text" id="src-uspw" placeholder="Cari Nama/Nomor US..." onkeyup="renderUSPW()">
+                        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:10px; margin-top:15px;" id="uspw-container"></div>
+                    </div>
+                </div>
+
+                <!-- QR SISWA -->
+                <div id="page-qr-siswa" class="page" style="display:none;">
+                    <div class="card">
+                        <h3><i class="fas fa-qrcode"></i> QR Code Siswa</h3>
+                        <select id="qr-kelas" onchange="renderQR()" style="width:auto; margin-bottom:10px;">
+                            <option value="">Pilih Kelas</option>
+                            <option value="7A">7A</option><option value="7B">7B</option>
+                            <option value="8A">8A</option><option value="8B">8B</option>
+                            <option value="9A">9A</option><option value="9B">9B</option>
+                        </select>
+                        <button class="btn-danger" onclick="dlQR('pdf')"><i class="fas fa-file-pdf"></i> PDF</button>
+                        <button style="background:#2196f3;" onclick="dlQR('word')"><i class="fas fa-file-word"></i> Word</button>
+                        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; margin-top:15px;" id="qr-container"></div>
+                    </div>
+                </div>
+
+                <!-- WAJAH GURU -->
+                <div id="page-wajah-guru" class="page" style="display:none;">
+                    <div class="card">
+                        <h3><i class="fas fa-user-tie"></i> Pengaturan Wajah Guru</h3>
+                        <div class="grid-2">
+                            <div>
+                                <div class="cam-container"><video id="cam-guru" autoplay></video></div>
+                                <button onclick="startCam('cam-guru')"><i class="fas fa-camera"></i> Buka Kamera</button>
+                                <button onclick="simpanWajahGuru()" class="btn-success"><i class="fas fa-save"></i> Simpan Wajah</button>
+                            </div>
+                            <div>
+                                <input type="text" id="guru-nama" placeholder="Nama Guru">
+                                <input type="text" id="guru-jabatan" placeholder="Jabatan / Mapel">
+                                <h4>Data Guru Terdaftar:</h4>
+                                <ul id="list-guru" style="padding-left:20px; font-size:14px;"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ABSEN SISWA -->
+                <div id="page-absen-siswa" class="page" style="display:none;">
+                    <div class="card">
+                        <h3><i class="fas fa-user-check"></i> Absensi Siswa</h3>
+                        <select id="absen-mapel" style="width:auto; margin-bottom:10px;">
+                            <option value="PKn">PKn</option><option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                            <option value="Bahasa Inggris">Bahasa Inggris</option><option value="Matematika">Matematika</option>
+                            <option value="IPA">IPA</option><option value="IPS">IPS</option><option value="Informatika">Informatika</option>
+                            <option value="Prakarya">Prakarya</option><option value="Agama Kristen">Agama Kristen</option>
+                            <option value="Agama Katolik">Agama Katolik</option><option value="Agama Islam">Agama Islam</option>
+                            <option value="Seni Budaya">Seni Budaya</option><option value="PJOK">PJOK</option>
+                        </select>
+                        <div class="cam-container"><video id="cam-absen-siswa" autoplay></video></div>
+                        <button onclick="startCam('cam-absen-siswa')"><i class="fas fa-camera"></i> Buka Kamera</button>
+                        <button onclick="simulasiAbsenSiswa()" class="btn-success"><i class="fas fa-check"></i> Verifikasi Wajah (Simulasi)</button>
+                    </div>
+                </div>
+
+                <!-- ABSEN GURU -->
+                <div id="page-absen-guru" class="page" style="display:none;">
+                    <div class="card">
+                        <h3><i class="fas fa-chalkboard-teacher"></i> Absensi Guru</h3>
+                        <div class="cam-container"><video id="cam-absen-guru" autoplay></video></div>
+                        <button onclick="startCam('cam-absen-guru')"><i class="fas fa-camera"></i> Buka Kamera</button>
+                        <div style="margin-top:10px;">
+                            <button onclick="simulasiAbsenGuru('Masuk')" class="btn-success"><i class="fas fa-sign-in-alt"></i> Masuk</button>
+                            <button onclick="simulasiAbsenGuru('Keluar')" class="btn-danger"><i class="fas fa-sign-out-alt"></i> Keluar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HASIL ABSEN SISWA -->
+                <div id="page-hasil-siswa" class="page" style="display:none;">
+                    <div class="card">
+                        <h3><i class="fas fa-clipboard-list"></i> Hasil Absensi Siswa</h3>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                            <input type="text" id="src-hasil-siswa" placeholder="Cari Nama..." onkeyup="renderHasilSiswa()" style="width:auto; flex:1;">
+                            <select id="filter-mapel-hasil" onchange="renderHasilSiswa()" style="width:auto;"></select>
+                            <input type="date" id="filter-tgl-hasil" onchange="renderHasilSiswa()" style="width:auto;">
+                            <button class="btn-success" onclick="exportExcel('Hasil Absen Siswa', 'tbl-hasil-siswa')"><i class="fas fa-file-excel"></i> Excel</button>
+                        </div>
+                        <div style="overflow-x:auto;">
+                            <table id="tbl-hasil-siswa">
+                                <thead><tr><th>Nama</th><th>Kelas</th><th>Mapel</th><th>Tanggal</th><th>Jam</th><th>Status</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HASIL ABSEN GURU -->
+                <div id="page-hasil-guru" class="page" style="display:none;">
+                    <div class="card">
+                        <h3><i class="fas fa-clipboard-list"></i> Riwayat Absensi Guru</h3>
+                        <button class="btn-success" onclick="exportExcel('Riwayat Absen Guru', 'tbl-hasil-guru')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <div style="overflow-x:auto; margin-top:10px;">
+                            <table id="tbl-hasil-guru">
+                                <thead><tr><th>Wajah</th><th>Nama</th><th>Jabatan</th><th>Tanggal</th><th>Jam</th><th>Status</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PENILAIAN DYNAMIC -->
+                <div id="page-nilai" class="page" style="display:none;">
+                    <div class="card" id="nilai-content"></div>
+                </div>
+
+                <!-- PENGATURAN -->
+                <div id="page-pengaturan" class="page" style="display:none;">
+                    <div class="card">
+                        <h3><i class="fas fa-cogs"></i> Pengaturan Aplikasi</h3>
+                        <div style="margin-bottom:15px;">
+                            <label>Logo Sekolah:</label><br>
+                            <img src="https://lh3.googleusercontent.com/d/18-fVQ1HqVhduTzsYSxFj6PqJop4ifDru" style="width:100px; margin-top:5px; border-radius:50%;">
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label>Pengumuman:</label>
+                            <textarea id="pengumuman-text" rows="4"></textarea>
+                            <button onclick="simpanPengumuman()"><i class="fas fa-save"></i> Simpan Pengumuman</button>
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <button class="btn-success" onclick="downloadBackup()"><i class="fas fa-download"></i> Download Seluruh Data</button>
+                            <button class="btn-warning" onclick="document.getElementById('import-file').click()"><i class="fas fa-upload"></i> Import Data</button>
+                            <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importBackup(event)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL QR SCANNER -->
+    <div id="scanner-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="text-align:center; color:var(--primary);">Scan QR Code Siswa</h3>
+            <div id="qr-reader" style="width:100%; margin-top:10px;"></div>
+            <button onclick="closeScanner()" class="btn-danger" style="width:100%; margin-top:10px;">Tutup Scanner</button>
+        </div>
+    </div>
 
 <script>
-/* ===================== DATA ===================== */
-// Master semua siswa (123) — digunakan untuk mata pelajaran dengan nilai 100
-const M=`KS7A0020001|Agustina Martha Jalnuhubun
-KS7A0020002|Alexa Sherryl Jabar
-KS7A0020003|Billyand Noah Putra Gaga
-KS7A0020004|Apolinaris Kelanit
-KS7A0020005|Aprilia Ela Sirwutubun
-KS7A0020006|Arlinda Metubun
-KS7A0020007|Bois Alfa Ngutra
-KS7A0020008|Dewi Putri Madubun
-KS7A0020009|Elagren Marlatu Lukas Madubun
-KS7A0020010|Fillano Pedrosa Masbaitubun
-KS7A0020011|Gracia Viona Yanyaan
-KS7A0020012|Johanes Obet Bertkat
-KS7A0020013|Jonathan Alvaro Moriolkosu
-KS7A0020014|Katarina Rumangun
-KS7A0020015|Maria Ayu Paisa
-KS7A0020016|Maria Syelena Suripatty Esomar
-KS7A0020017|Maria Theresia Rumangun
-KS7A0020018|Marlina Ingke Balriyanan
-KS7A0020019|Menci Elsina Fantri Karatem
-KS7A0020020|Oktovianus Jamrevav
-KS7A0020021|Reza Dwi Eirlangga Jamlean
-KS7A0020022|Steven Arnold Laumualy
-KS7A0020023|Yohana T Resubun
-KS7B0020001|Agnes Adriana Tawain.
-KS7B0020002|Allmendo Xavi Remetwa.
-KS7B0020003|Alexander Simon Vatubun
-KS7B0020004|Aroby Tamher
-KS7B0020005|Aprilia Lidwina Welikin
-KS7B0020006|Blasius Paskal Dewaut
-KS7B0020007|Chaylen Manis Koedoeboen
-KS7B0020008|Firman Tanarubun
-KS7B0020009|Herlina Abarua
-KS7B0020010|Julius Marzelino Fadirubun
-KS7B0020011|Jumadi Tamher
-KS7B0020012|Kanisius Kebubun
-KS7B0020013|Mintje Glorya Balubun
-KS7B0020014|Margaretha Futubun
-KS7B0020015|Mikha Desire Rukait
-KS7B0020016|Mawar Sharon Kirwelakubun
-KS7B0020017|Nahla Abidin Rahakratat
-KS7B0020018|Penina Rumangun
-KS7B0020019|Rafail Rengur
-KS7B0020020|Udeta Insoraki Rumyaan
-KS7B0020021|Yosep L Takerubun
-KS7B0020022|Maria A. Heatubun
-KS8A0020001|Alinda Ode
-KS8A0020002|Andreas Balubun
-KS8A0020003|Benedicta Petra Akbar
-KS8A0020004|Carolus B. Varis Wemaf
-KS8A0020005|Everets Jiffy Gattu
-KS8A0020006|Filipho Aditya Somnaikubun
-KS8A0020007|Gabriel Alferdo Ubyaan
-KS8A0020008|Giofani Falentino Lutrun
-KS8A0020009|Yoseph Erlangga Lamere
-KS8A0020010|Klementina Fernatyanan
-KS8A0020011|Mediana Aziera Jeujanan
-KS8A0020012|Rahmatia Bugis
-KS8A0020013|Reinal Moriolkosu
-KS8A0020014|Shalmon Antony Rahangmetan
-KS8A0020015|Vinsensius Edoardus Balubun
-KS8A0020016|Welhelmus Zyerzeven Ngarbingan
-KS8A0020017|Marius Rahalus
-KS8A0020018|Harita F. Laritmas
-KS8A0020019|Gracia F. Meterai
-KS8A0020020|Revandi Mukujei
-KS8B0020001|adriana theresia rahabav
-KS8B0020002|Christ Noel Desandro Emyu Souhoka
-KS8B0020003|Dewanti Sari Jamlean
-KS8B0020004|Fabiano B. S. Janjaan
-KS8B0020005|Gabriella Ernesta K. Kanarubun
-KS8B0020006|Gregorius Higuen Balubun
-KS8B0020007|Johanis Charles Woersok
-KS8B0020008|Maria Gratia Maturbongs
-KS8B0020009|Michael Joseph Masbaitubun
-KS8B0020010|Oksen Petrus Letsoin
-KS8B0020011|Paulina Chelsie Renwarin
-KS8B0020012|Restha Jenifer Rahanra
-KS8B0020013|Wensislaus Eko Wemaf
-KS8B0020014|FILIO EMANUEL FAR-FAR
-KS8B0020015|SYANE SELFI RAHANGMETAN
-KS8B0020016|MARIA STEFANI ATBAR
-KS8B0020017|Ronal Regen Rahayaan
-KS8B0020018|Marwan R. Rahayaan
-KS9A0020001|ADRIANUS RAHANAU
-KS9A0020002|ADRIEL CALVINO RENWARIN
-KS9A0020003|AMOS RISAL OILIRA
-KS9A0020004|DIANA HERMINA HUAWAE
-KS9A0020005|VIRGYLIUS M.Y. LEFTUNGUN
-KS9A0020006|GIDION LEFTA
-KS9A0020007|INTAN RAHAKBAUW
-KS9A0020008|KEANO MACKENZIE RAHAJAAN
-KS9A0020009|LEONTINA JEUJANAN
-KS9A0020010|MARCELINO ALDO RENYAAN
-KS9A0020011|MARIA MUTIARA WARAT
-KS9A0020012|MELATI AUREL ROSYADI
-KS9A0020013|MICHAELA P. D. TAPOTUBUN
-KS9A0020014|NILAM MARSDA WABULA
-KS9A0020015|ROBBEN JAKOBUS OHOILEDJAAN
-KS9A0020016|ROSNATA PUSPITA RENWARIN
-KS9A0020017|WELHELMUS RUMANGUN
-KS9A0020018|WIDY CLEANDRA AZAZYA JABAR
-KS9A0020019|WILIN NOTANUBUN
-KS9A0020020|LANA RIECEL LABOBAR
-KS9B0020001|ANDREAS LORENZO TAKERUBUN
-KS9B0020002|ALFONSINA OHOIULUN
-KS9B0020003|AZAN AKBAR TUKLOY
-KS9B0020004|BERNADETA SIAHAYA
-KS9B0020005|DINDA PELANGI RENHORAN
-KS9B0020006|INTAN MASAHIDA
-KS9B0020007|ISRAEL. ABRISYE LABETUBUN
-KS9B0020008|KRISTINA ANGRENI WELERUBUN
-KS9B0020009|MARIANUS NGARBINGAN
-KS9B0020010|MARTHA MELSASAIL
-KS9B0020011|MUSA EFRUAN
-KS9B0020012|MARIA BIN METURAN
-KS9B0020013|NADYA HOEKOEBOEN
-KS9B0020014|RONI ANGGARA RAWULUNUBUN
-KS9B0020015|RAHEL M TARANTEIN
-KS9B0020016|SANDRA JEKLIN FARYO
-KS9B0020017|YOHANIS MESI EFRUAN
-KS9B0020018|YOHANIS MARVEL JAMREVAV
-KS9B0020019|WILHELMUS RAHALOB
-KS9B0020020|ZULKIFLI RAHAKBAUW`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim()]});
+    // ===================== DATABASE =====================
+    let currentUser = null;
+    let dbSiswa = [], dbUSPW = [], dbAbsenSiswa = [], dbAbsenGuru = [], dbGuru = [], dbNilaiHTS = {}, dbNilaiHS = {};
+    let appSettings = { pengumuman: "Pada Hari Rabu mapel PKn dan IPS semua siswa hadir pada jam 07.30. Karena terdapat 2 mata pelajaran maka digunakan sistem saling bergantian. Jika dilakukan per sesi pada mata pelajaran sebelumnya, maka kegiatan belajar akan selesai terlalu malam. Terima kasih atas perhatiannya. (by. Proktor USP)" };
+    const mapelList = ["PKn", "Bahasa Indonesia", "Bahasa Inggris", "Matematika", "IPS", "IPA", "Agama Katolik", "Agama Kristen", "Agama Islam", "PJOK", "Prakarya", "TIK"];
 
-// Bahasa Indonesia (103 siswa)
-const BI=`KS7A0020001|Agustina Martha Jalnuhubun|0
-KS7A0020002|Alexa Sherryl Jabar|84
-KS7A0020003|Billyand Noah Putra Gaga|82
-KS7A0020004|Apolinaris Kelanit|76
-KS7A0020005|Aprilia Ela Sirwutubun|78
-KS7A0020006|Arlinda Metubun|78
-KS7A0020007|Bois Alfa Ngutra|65
-KS7A0020008|Dewi Putri Madubun|78
-KS7A0020009|Elagren Marlatu Lukas Madubun|71
-KS7A0020010|Fillano Pedrosa Masbaitubun|35
-KS7A0020011|Gracia Viona Yanyaan|57
-KS7A0020012|Johanes Obet Bertkat|65
-KS7A0020013|Jonathan Alvaro Moriolkosu|69
-KS7A0020015|Maria Ayu Paisa|73
-KS7A0020017|Maria Theresia Rumangun|78
-KS7A0020018|Marlina Ingke Balriyanan|78
-KS7A0020019|Menci Elsina Fantri Karatem|63
-KS7A0020020|Oktovianus Jamrevav|46
-KS7A0020022|Steven Arnold Laumualy|53
-KS7A0020023|Yohana T Resubun|80
-KS7B0020001|Agnes Adriana Tawain.|78
-KS7B0020002|Allmendo Xavi Remetwa.|80
-KS7B0020004|Aroby Tamher|61
-KS7B0020005|Aprilia Lidwina Welikin|55
-KS7B0020007|Chaylen Manis Koedoeboen|77
-KS7B0020008|Firman Tanarubun|42
-KS7B0020009|Herlina Abarua|77
-KS7B0020010|Julius Marzelino Fadirubun|59
-KS7B0020011|Jumadi Tamher|51
-KS7B0020013|Mintje Glorya Balubun|82
-KS7B0020014|Margaretha Futubun|48
-KS7B0020015|Mikha Desire Rukait|84
-KS7B0020016|Mawar Sharon Kirwelakubun|72
-KS7B0020017|Nahla Abidin Rahakratat|79
-KS7B0020018|Penina Rumangun|77
-KS7B0020019|Rafail Rengur|69
-KS7B0020020|Udeta Insoraki Rumyaan|69
-KS7B0020021|Yosep L Takerubun|49
-KS7B0020022|Maria A. Heatubun|49
-KS8A0020001|Alinda Ode|83.5
-KS8A0020002|Andreas Balubun|85
-KS8A0020003|Benedicta Petra Akbar|87
-KS8A0020004|Carolus B. Varis Wemaf|53.5
-KS8A0020005|Everets Jiffy Gattu|85
-KS8A0020009|Yoseph Erlangga Lamere|85
-KS8A0020010|Klementina Fernatyanan|59.5
-KS8A0020011|Mediana Aziera Jeujanan|81
-KS8A0020012|Rahmatia Bugis|84
-KS8A0020013|Reinal Moriolkosu|78
-KS8A0020014|Shalmon Antony Rahangmetan|81
-KS8A0020015|Vinsensius Edoardus Balubun|42
-KS8A0020016|Welhelmus Zyerzeven Ngarbingan|59.5
-KS8A0020018|Harita F. Laritmas|40.5
-KS8A0020020|Revandi Mukujei|40
-KS8B0020001|adriana theresia rahabav|87
-KS8B0020002|Christ Noel Desandro Emyu Souhoka|89.5
-KS8B0020003|Dewanti Sari Jamlean|81
-KS8B0020004|Fabiano B. S. Janjaan|30.5
-KS8B0020005|Gabriella Ernesta K. Kanarubun|89
-KS8B0020006|Gregorius Higuen Balubun|79
-KS8B0020007|Johanis Charles Woersok|69
-KS8B0020008|Maria Gratia Maturbongs|89
-KS8B0020009|Michael Joseph Masbaitubun|91
-KS8B0020010|Oksen Petrus Letsoin|80.5
-KS8B0020011|Paulina Chelsie Renwarin|88
-KS8B0020012|Restha Jenifer Rahanra|75
-KS8B0020014|FILIO EMANUEL FAR-FAR|77
-KS8B0020015|SYANE SELFI RAHANGMETAN|85
-KS8B0020016|MARIA STEFANI ATBAR|85
-KS8B0020018|Marwan R. Rahayaan|53
-KS9A0020001|ADRIANUS RAHANAU|52
-KS9A0020002|ADRIEL CALVINO RENWARIN|81
-KS9A0020003|AMOS RISAL OILIRA|43
-KS9A0020004|DIANA HERMINA HUAWAE|67
-KS9A0020005|VIRGYLIUS M.Y. LEFTUNGUN|73
-KS9A0020006|GIDION LEFTA|70
-KS9A0020007|INTAN RAHAKBAUW|83
-KS9A0020008|KEANO MACKENZIE RAHAJAAN|72
-KS9A0020009|LEONTINA JEUJANAN|86
-KS9A0020010|MARCELINO ALDO RENYAAN|69
-KS9A0020011|MARIA MUTIARA WARAT|62
-KS9A0020012|MELATI AUREL ROSYADI|86
-KS9A0020013|MICHAELA P. D. TAPOTUBUN|83
-KS9A0020014|NILAM MARSDA WABULA|67
-KS9A0020016|ROSNATA PUSPITA RENWARIN|31
-KS9A0020017|WELHELMUS RUMANGUN|72
-KS9A0020018|WIDY CLEANDRA AZAZYA JABAR|86
-KS9A0020019|WILIN NOTANUBUN|75
-KS9A0020020|LANA RIECEL LABOBAR|53
-KS9B0020001|ANDREAS LORENZO TAKERUBUN|60
-KS9B0020002|ALFONSINA OHOIULUN|57
-KS9B0020004|BERNADETA SIAHAYA|68
-KS9B0020005|DINDA PELANGI RENHORAN|75
-KS9B0020006|INTAN MASAHIDA|73
-KS9B0020008|KRISTINA ANGRENI WELERUBUN|81
-KS9B0020010|MARTHA MELSASAIL|71
-KS9B0020011|MUSA EFRUAN|78
-KS9B0020012|MARIA BIN METURAN|84
-KS9B0020013|NADYA HOEKOEBOEN|69
-KS9B0020014|RONI ANGGARA RAWULUNUBUN|82
-KS9B0020015|RAHEL M TARANTEIN|77
-KS9B0020016|SANDRA JEKLIN FARYO|62
-KS9B0020018|YOHANIS MARVEL JAMREVAV|28
-KS9B0020020|ZULKIFLI RAHAKBAUW|47`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
+    function initDB() {
+        dbSiswa = JSON.parse(localStorage.getItem('dbSiswa')) || [
+            {nisn:"3138223936", nama:"AGUSTINA MARTHA JALNUHUUBUN", agama:"Kristen", tmpt:"LANGGUR", tgl:"2013-07-02", kelas:"7A"},
+            {nisn:"0137254931", nama:"ALEXA SHERRYL JABAR", agama:"Kristen", tmpt:"BEKASI", tgl:"2013-01-25", kelas:"7A"},
+            {nisn:"0139197990", nama:"APOLINARIS KELANIT", agama:"Katholik", tmpt:"Langgur", tgl:"2013-07-28", kelas:"7A"},
+            {nisn:"3139861912", nama:"APRILIA ELA SIRWUTUBUN", agama:"Katholik", tmpt:"Namar", tgl:"2013-04-14", kelas:"7A"},
+            {nisn:"3133562917", nama:"ARLINDA METUBUN", agama:"Kristen", tmpt:"Langgur", tgl:"2013-03-08", kelas:"7A"},
+            {nisn:"3123490991", nama:"BOIS ALFA NGUTRA", agama:"Kristen", tmpt:"KILWAT", tgl:"2013-06-07", kelas:"7A"},
+            {nisn:"3138232801", nama:"Dewi Putri Madubun", agama:"Kristen", tmpt:"Kolser", tgl:"2013-05-16", kelas:"7A"},
+            {nisn:"3159299551", nama:"ELAGREN MARLATU LUKAS MADUBUN", agama:"Kristen", tmpt:"Tual", tgl:"2015-05-14", kelas:"7A"},
+            {nisn:"3122773351", nama:"FILLANO PEDROSA MASBAITUBUN", agama:"Kristen", tmpt:"Langgur", tgl:"2012-07-01", kelas:"7A"},
+            {nisn:"3125127206", nama:"GRACHIA VIONE YANYAAN", agama:"Katholik", tmpt:"LANGGUR", tgl:"2012-10-10", kelas:"7A"},
+            {nisn:"3122434899", nama:"Johanis Obeth Berkat", agama:"Kristen", tmpt:"langgur", tgl:"2012-09-10", kelas:"7A"},
+            {nisn:"3120720272", nama:"Jonatan Alvaro Moriolkosu", agama:"Kristen", tmpt:"Langgur", tgl:"2012-07-17", kelas:"7A"},
+            {nisn:"3133231497", nama:"Katarina Rumangun", agama:"Katholik", tmpt:"Faan", tgl:"2013-02-04", kelas:"7A"},
+            {nisn:"3129659657", nama:"Maria Ayu Aipassa", agama:"Katholik", tmpt:"Tual", tgl:"2012-06-08", kelas:"7A"},
+            {nisn:"3132640223", nama:"MARIA SYELENA SURIPATTY ESOMAR", agama:"Katholik", tmpt:"LANGGUR", tgl:"2013-01-12", kelas:"7A"},
+            {nisn:"0126844421", nama:"MARIA THERESIA RUMANGUN", agama:"Katholik", tmpt:"Langgur", tgl:"2012-04-16", kelas:"7A"},
+            {nisn:"3132082495", nama:"MARLINA INGKE BALRIYANAN", agama:"Katholik", tmpt:"Dobo", tgl:"2013-05-11", kelas:"7A"},
+            {nisn:"0132768217", nama:"MENCI ELSINA FANTRI KARATEM", agama:"Kristen", tmpt:"TUAL", tgl:"2012-12-20", kelas:"7A"},
+            {nisn:"0088873937", nama:"Oktovianus Jamrewav", agama:"Katholik", tmpt:"Fidatan", tgl:"2011-03-11", kelas:"7A"},
+            {nisn:"0113027951", nama:"Penina Rumangun", agama:"Katholik", tmpt:"Timika", tgl:"2011-11-19", kelas:"7A"},
+            {nisn:"3137322118", nama:"REZA DWI ERLANGGA YAMLEAN", agama:"Islam", tmpt:"FIDITAN", tgl:"2013-10-22", kelas:"7A"},
+            {nisn:"3127715674", nama:"STEVEN ARNOLD LAUMUALY", agama:"Kristen", tmpt:"Langgur", tgl:"2012-05-08", kelas:"7A"},
+            {nisn:"3134077676", nama:"YOHANA TRISUCI RESUBUN", agama:"Katholik", tmpt:"LANGGUR", tgl:"2013-03-29", kelas:"7A"},
+            {nisn:"3128617907", nama:"AGNES ADRIANA TAWAIN", agama:"Kristen", tmpt:"Rerean", tgl:"2012-08-21", kelas:"7B"},
+            {nisn:"3127162508", nama:"ALEXANDER SIMON VIRGO FATUBUN", agama:"Katholik", tmpt:"OHOIJANG", tgl:"2012-12-14", kelas:"7B"},
+            {nisn:"0134125862", nama:"ALLMENDO XAVI REMETWA", agama:"Katholik", tmpt:"LANGGUR", tgl:"2013-04-13", kelas:"7B"},
+            {nisn:"3134146001", nama:"Aprilia Lidwina  Wellikin", agama:"Katholik", tmpt:"Timika", tgl:"2013-04-14", kelas:"7B"},
+            {nisn:"3131460306", nama:"AROBI TAMHER", agama:"Islam", tmpt:"FAIR", tgl:"2013-09-18", kelas:"7B"},
+            {nisn:"0122474788", nama:"BILLYAND NOAH PUTRA GAGA", agama:"Kristen", tmpt:"LANGGUR", tgl:"2012-11-13", kelas:"7B"},
+            {nisn:"3123008124", nama:"BLASIUS PASKAL DEWAUT", agama:"Katholik", tmpt:"KILWAIR", tgl:"2012-04-08", kelas:"7B"},
+            {nisn:"0131597842", nama:"CHAYLEN MANIS KOEDOEBOEN", agama:"Kristen", tmpt:"Tual", tgl:"2013-09-11", kelas:"7B"},
+            {nisn:"3125012331", nama:"DAVID JUAN SEBENAN", agama:"Katholik", tmpt:"KILWAIR", tgl:"2012-06-04", kelas:"7B"},
+            {nisn:"3134682689", nama:"FIRMAN TANARUBUN", agama:"Islam", tmpt:"Fair", tgl:"2013-03-21", kelas:"7B"},
+            {nisn:"3125366616", nama:"HERLINA ABARUA", agama:"Kristen", tmpt:"JAKARTA", tgl:"2012-08-21", kelas:"7B"},
+            {nisn:"3129815310", nama:"JULIUS MARZHELINO FADIRUBUN", agama:"Katholik", tmpt:"KOLSER", tgl:"2012-07-28", kelas:"7B"},
+            {nisn:"3131346609", nama:"JUMADI TAMHER", agama:"Islam", tmpt:"Fair", tgl:"2013-01-25", kelas:"7B"},
+            {nisn:"3129317367", nama:"Kanisius Kebubun", agama:"Katholik", tmpt:"Ngadi", tgl:"2012-03-13", kelas:"7B"},
+            {nisn:"0116068420", nama:"MARGARETA FATUBUN", agama:"Katholik", tmpt:"LANGGUR", tgl:"2011-03-01", kelas:"7B"},
+            {nisn:"3126026824", nama:"Mawar Sharon Kirwelakubun", agama:"Katholik", tmpt:"Tual", tgl:"2012-10-12", kelas:"7B"},
+            {nisn:"3128205324", nama:"MIKHA DESIRE RUKAIT", agama:"Kristen", tmpt:"Langgur", tgl:"2012-10-13", kelas:"7B"},
+            {nisn:"3133235569", nama:"MINTJIE GLORYA BALUBUN", agama:"Kristen", tmpt:"BENJINA", tgl:"2013-10-10", kelas:"7B"},
+            {nisn:"3139106372", nama:"NAHLA ABIDIN RAHAKRATAT", agama:"Islam", tmpt:"OHOIDERTAVUN", tgl:"2013-01-31", kelas:"7B"},
+            {nisn:"3101969955", nama:"Rafael Rengur", agama:"Kristen", tmpt:"Passo", tgl:"2010-08-29", kelas:"7B"},
+            {nisn:"3130606754", nama:"UDETA INSORAKI RUMYAAN", agama:"Katholik", tmpt:"TIMIKA", tgl:"2013-01-07", kelas:"7B"},
+            {nisn:"3123789203", nama:"YOSEPH LEONARDO TAKERUBUN", agama:"Katholik", tmpt:"Namar", tgl:"2012-12-09", kelas:"7B"},
+            {nisn:"3123187460", nama:"ALINDA ODE", agama:"Islam", tmpt:"FAIR", tgl:"2013-03-09", kelas:"8A"},
+            {nisn:"3121685719", nama:"ANDREAS BALUBUN", agama:"Katholik", tmpt:"INGEI", tgl:"2012-07-23", kelas:"8A"},
+            {nisn:"0123394427", nama:"Benedicta Petra Akbar", agama:"Katholik", tmpt:"Langgur", tgl:"2012-05-14", kelas:"8A"},
+            {nisn:"0108434499", nama:"CAROLUS BOROMEUS VARIS WEMAF", agama:"Katholik", tmpt:"LANGGUR", tgl:"2010-02-17", kelas:"8A"},
+            {nisn:"0128757649", nama:"EVEREST JIFFY GATTU", agama:"Kristen", tmpt:"Saparua", tgl:"2012-03-20", kelas:"8A"},
+            {nisn:"0116837865", nama:"FILIPHO ADITYA SOMNAIKUBUN", agama:"Kristen", tmpt:"TUAL", tgl:"2012-08-19", kelas:"8A"},
+            {nisn:"0122324503", nama:"GABRIEL ALVINDO UBYAAN", agama:"Kristen", tmpt:"TAAR", tgl:"2012-05-12", kelas:"8A"},
+            {nisn:"0123979567", nama:"HARITA VELFIA LARITMAS", agama:"Kristen", tmpt:"SAUMLAKI", tgl:"2013-04-04", kelas:"8A"},
+            {nisn:"3125404446", nama:"KLEMENTINA FERNATYANAN", agama:"Katholik", tmpt:"LANGGUR", tgl:"2012-05-25", kelas:"8A"},
+            {nisn:"0117054290", nama:"MARWAN HAMID RENHORAN", agama:"Islam", tmpt:"OHOIDERTAWUN", tgl:"2011-04-15", kelas:"8A"},
+            {nisn:"0115452089", nama:"MEDIANA  AZIERA QUEEN JEUJANAN", agama:"Katholik", tmpt:"OHOIJANG", tgl:"2011-10-27", kelas:"8A"},
+            {nisn:"3121745741", nama:"RAHMATIA BUGIS", agama:"Islam", tmpt:"FAIR", tgl:"2012-07-11", kelas:"8A"},
+            {nisn:"0122884461", nama:"REVANDI SAIMEN MUKUDJEY", agama:"Kristen", tmpt:"Kelanit", tgl:"2012-08-30", kelas:"8A"},
+            {nisn:"0122305146", nama:"REYNALD MORIOLKOSU", agama:"Kristen", tmpt:"Tual", tgl:"2013-04-10", kelas:"8A"},
+            {nisn:"0129886871", nama:"RONAL REGEN RAHAYAAN", agama:"Kristen", tmpt:"AWATA", tgl:"2012-02-13", kelas:"8A"},
+            {nisn:"3104037269", nama:"Shalmon Anthony Rahangmetan", agama:"Kristen", tmpt:"Langgur", tgl:"2012-01-30", kelas:"8A"},
+            {nisn:"0109387439", nama:"VINSENSIUS EDOARDUS BALUBUN", agama:"Katholik", tmpt:"NGAYUB", tgl:"2007-09-27", kelas:"8A"},
+            {nisn:"3133412021", nama:"WELHELMUS ZYERZEVEN NGARBINGAN", agama:"Kristen", tmpt:"OHOIEL", tgl:"2013-03-17", kelas:"8A"},
+            {nisn:"0119868041", nama:"YOSEPH ERLANGGA LAMERE", agama:"Katholik", tmpt:"TUAL", tgl:"2011-08-22", kelas:"8A"},
+            {nisn:"0124695312", nama:"Gracia F. Meterai", agama:"Katholik", tmpt:"Langgur", tgl:"2012-02-02", kelas:"8A"},
+            {nisn:"0119978547", nama:"Adriana Theresia Rahabav", agama:"Katholik", tmpt:"Langgur", tgl:"2011-05-11", kelas:"8B"},
+            {nisn:"0116870954", nama:"CHRIST NOEL DESANDRO EMYU SOUHOKA", agama:"Kristen", tmpt:"LANGGUR", tgl:"2011-12-04", kelas:"8B"},
+            {nisn:"0107698194", nama:"DEWANTI SARI JAMLEAN", agama:"Katholik", tmpt:"OHOIJANG", tgl:"2009-02-02", kelas:"8B"},
+            {nisn:"3100189546", nama:"FABIANO BIMA SAKTI YANYAAN", agama:"Katholik", tmpt:"TUAL", tgl:"2010-06-21", kelas:"8B"},
+            {nisn:"0121569220", nama:"FILLIO IMMANUEL FAR-FAR", agama:"Kristen", tmpt:"LANGGUR", tgl:"2013-02-28", kelas:"8B"},
+            {nisn:"0114442785", nama:"GABRIELLA ERNESTA KEYS KANARUBUN", agama:"Katholik", tmpt:"DEBUT", tgl:"2012-02-17", kelas:"8B"},
+            {nisn:"0112501358", nama:"GIOFANI FALENTINO LUTRUN", agama:"Katholik", tmpt:"KOLSER", tgl:"2011-10-05", kelas:"8B"},
+            {nisn:"3124387010", nama:"GREGORIUS HIGUEN BALUBUN", agama:"Katholik", tmpt:"KOLSER", tgl:"2012-05-04", kelas:"8B"},
+            {nisn:"0129549605", nama:"Johanis Charles Woersok", agama:"Kristen", tmpt:"Kelanit", tgl:"2012-03-04", kelas:"8B"},
+            {nisn:"0116787995", nama:"Maria Gratia Maturbongs", agama:"Katholik", tmpt:"Kolser", tgl:"2011-10-22", kelas:"8B"},
+            {nisn:"0126628057", nama:"MARIA STEFANI ATBAR", agama:"Katholik", tmpt:"Rumat", tgl:"2012-01-26", kelas:"8B"},
+            {nisn:"3101247120", nama:"Marius Rahalus", agama:"Katholik", tmpt:"haar", tgl:"2010-07-15", kelas:"8B"},
+            {nisn:"0128750995", nama:"Michael Joseph Masbaitubun", agama:"Kristen", tmpt:"Langgur", tgl:"2012-05-01", kelas:"8B"},
+            {nisn:"0114198067", nama:"OKSEN PETRUS LETSOIN", agama:"Katholik", tmpt:"MERAUKE", tgl:"2011-10-09", kelas:"8B"},
+            {nisn:"0114129563", nama:"PAULINA CHELSIE RENWARIN", agama:"Katholik", tmpt:"LANGGUR", tgl:"2011-01-14", kelas:"8B"},
+            {nisn:"3124547348", nama:"RESTHA JENIFER RAHANRA", agama:"Kristen", tmpt:"LANGGUR", tgl:"2012-03-30", kelas:"8B"},
+            {nisn:"0115060163", nama:"SYANE SELVI RAHANGMETAN", agama:"Kristen", tmpt:"LANGGUR", tgl:"2011-09-01", kelas:"8B"},
+            {nisn:"0106244165", nama:"WENSISLAUS EKO WEMAF", agama:"Katholik", tmpt:"LANGGUR", tgl:"2010-02-17", kelas:"8B"},
+            {nisn:"0119104663", nama:"ADRIANUS RAHANAU", agama:"Katholik", tmpt:"HOLLAT", tgl:"2011-02-08", kelas:"9A"},
+            {nisn:"0115816694", nama:"Dinda Pelangi Renhoran", agama:"Islam", tmpt:"Langgur", tgl:"2011-09-26", kelas:"9A"},
+            {nisn:"0111601047", nama:"GIDION LEFTA", agama:"Kristen", tmpt:"LANGGUR", tgl:"2011-11-29", kelas:"9A"},
+            {nisn:"0108863139", nama:"Intan Rahakbauw", agama:"Kristen", tmpt:"Ambon", tgl:"2010-04-16", kelas:"9A"},
+            {nisn:"0097821250", nama:"ISRAEL ABRISYE RAHAKBAUW", agama:"Kristen", tmpt:"OHOIDERTAWUN", tgl:"2009-10-05", kelas:"9A"},
+            {nisn:"0117371970", nama:"Leontina Jeujanan", agama:"Katholik", tmpt:"Langgur", tgl:"2011-04-13", kelas:"9A"},
+            {nisn:"0119585332", nama:"MARIA BIN MATURAN", agama:"Katholik", tmpt:"HOLLAY", tgl:"2011-04-07", kelas:"9A"},
+            {nisn:"0113664129", nama:"MARTHA MELSASAIL", agama:"Kristen", tmpt:"Ohoijang", tgl:"2011-06-11", kelas:"9A"},
+            {nisn:"0102848680", nama:"Melati Aurel Rosyadi", agama:"Islam", tmpt:"Gemba", tgl:"2010-08-14", kelas:"9A"},
+            {nisn:"0117636326", nama:"Nadya Hoekoeboen", agama:"Kristen", tmpt:"LANGGUR", tgl:"2011-05-03", kelas:"9A"},
+            {nisn:"0113509814", nama:"NILAM MARSDA WABULA", agama:"Islam", tmpt:"SELAYAR", tgl:"2011-06-20", kelas:"9A"},
+            {nisn:"0107111155", nama:"Robben Jakobus Ohoiledjaan", agama:"Katholik", tmpt:"Langgur", tgl:"2010-10-12", kelas:"9A"},
+            {nisn:"0109578290", nama:"Roni Anggara Rawulunubun", agama:"Katholik", tmpt:"Ohoijang", tgl:"2010-01-09", kelas:"9A"},
+            {nisn:"0088254087", nama:"Rosnata Puspita Renwarin", agama:"Katholik", tmpt:"Langgur", tgl:"2008-06-05", kelas:"9A"},
+            {nisn:"3117402362", nama:"Virgylius Mathias Yahya Leftungun", agama:"Katholik", tmpt:"Seira", tgl:"2011-12-22", kelas:"9A"},
+            {nisn:"0095340648", nama:"WELHELMUS RAHALOB", agama:"Katholik", tmpt:"OHOILUS", tgl:"2009-11-02", kelas:"9A"},
+            {nisn:"0114217491", nama:"Widy Cleandra Azazya Jabar", agama:"Kristen", tmpt:"Langgur", tgl:"2011-11-26", kelas:"9A"},
+            {nisn:"0112676011", nama:"Wilin Notanubun", agama:"Kristen", tmpt:"Ohoijang", tgl:"2011-05-28", kelas:"9A"},
+            {nisn:"0105416675", nama:"YOHANIS MESSI EFRUAN", agama:"Katholik", tmpt:"LAIRNGANGAS", tgl:"2010-08-15", kelas:"9A"},
+            {nisn:"0119679807", nama:"ZULKIFLI RAHAKBAUW", agama:"Islam", tmpt:"AMBON", tgl:"2011-05-27", kelas:"9A"},
+            {nisn:"0113099666", nama:"Adriel Calvino Renwarin", agama:"Kristen", tmpt:"Langgur", tgl:"2011-09-29", kelas:"9B"},
+            {nisn:"0094424368", nama:"ALFONSINA OHOIULUN", agama:"Katholik", tmpt:"OHOIWIRIN", tgl:"2010-02-20", kelas:"9B"},
+            {nisn:"0098735832", nama:"AMOS RISAL OILIRA", agama:"Katholik", tmpt:"NAMAR", tgl:"2010-09-09", kelas:"9B"},
+            {nisn:"0107969045", nama:"ANDREAS LORENZO TAKERUBUN", agama:"Katholik", tmpt:"NAMAR", tgl:"2010-07-06", kelas:"9B"},
+            {nisn:"0115146498", nama:"AZAN AKBAR TUKLOY", agama:"Islam", tmpt:"LETMAN", tgl:"2011-04-15", kelas:"9B"},
+            {nisn:"0103995936", nama:"Bernadeta Siahaya", agama:"Katholik", tmpt:"AMBON", tgl:"2010-06-03", kelas:"9B"},
+            {nisn:"0114256836", nama:"Diana Hermina Huwae", agama:"Kristen", tmpt:"Tual", tgl:"2011-01-05", kelas:"9B"},
+            {nisn:"0117016202", nama:"Intan Masahida", agama:"Islam", tmpt:"Selayar", tgl:"2011-01-13", kelas:"9B"},
+            {nisn:"0101328716", nama:"Keano Mackenzie Rahajaan", agama:"Kristen", tmpt:"Langgur", tgl:"2010-10-29", kelas:"9B"},
+            {nisn:"0119135798", nama:"KRISTINA ANGRENI WELERUBUN", agama:"Katholik", tmpt:"SORONG", tgl:"2011-11-07", kelas:"9B"},
+            {nisn:"0111382085", nama:"LANA  RIECHEL LABOBAR", agama:"Kristen", tmpt:"LINGAT", tgl:"2011-01-12", kelas:"9B"},
+            {nisn:"0109982531", nama:"Marcelino Aldo Renyaan", agama:"Kristen", tmpt:"Langgur", tgl:"2010-09-02", kelas:"9B"},
+            {nisn:"0116724136", nama:"MARIA MUTIARA WARAT", agama:"Katholik", tmpt:"KATLARAT", tgl:"2011-11-15", kelas:"9B"},
+            {nisn:"3108615514", nama:"Marianus Ngarbingan", agama:"Kristen", tmpt:"Karangguli", tgl:"2010-05-12", kelas:"9B"},
+            {nisn:"0116244499", nama:"MICHAELA PRINCESSA DEBORA TAPOTUBUN", agama:"Kristen", tmpt:"LANGGUR", tgl:"2011-06-24", kelas:"9B"},
+            {nisn:"0113222069", nama:"MUSA EFRUAN", agama:"Katholik", tmpt:"Ambon", tgl:"2011-07-21", kelas:"9B"},
+            {nisn:"0105665906", nama:"RACHEL MICHEL TARANTEIN", agama:"Kristen", tmpt:"RSUD Karel Sadsuitubun", tgl:"2010-12-30", kelas:"9B"},
+            {nisn:"0097290435", nama:"Sandra Jaclina Fairyo", agama:"Katholik", tmpt:"Timika", tgl:"2010-01-27", kelas:"9B"},
+            {nisn:"0096451406", nama:"Wilhelmus Rumangun", agama:"Katholik", tmpt:"Langgur", tgl:"2010-11-10", kelas:"9B"},
+            {nisn:"0085825100", nama:"Yohanis Marvel Jamrewav", agama:"Katholik", tmpt:"Langgur", tgl:"2008-12-23", kelas:"9B"}
+        ];
 
-// Agama Katolik (50 siswa)
-const AK=`KS7A0020004|Apolinaris Kelanit|85
-KS7A0020005|Aprilia Ela Sirwutubun|80
-KS7A0020011|Gracia Viona Yanyaan|48
-KS7A0020015|Maria Ayu Paisa|69
-KS7A0020017|Maria Theresia Rumangun|91
-KS7A0020018|Marlina Ingke Balriyanan|96
-KS7A0020020|Oktovianus Jamrevav|37
-KS7A0020023|Yohana T Resubun|92
-KS7B0020002|Allmendo Xavi Remetwa.|86
-KS7B0020003|Alexander Simon Vatubun|28
-KS7B0020005|Aprilia Lidwina Welikin|84
-KS7B0020010|Julius Marzelino Fadirubun|69
-KS7B0020014|Margaretha Futubun|39
-KS7B0020016|Mawar Sharon Kirwelakubun|94
-KS7B0020018|Penina Rumangun|83
-KS7B0020020|Udeta Insoraki Rumyaan|64
-KS7B0020021|Yosep L Takerubun|67
-KS7B0020022|Maria A. Heatubun|40
-KS8A0020002|Andreas Balubun|32
-KS8A0020003|Benedicta Petra Akbar|92
-KS8A0020004|Carolus B. Varis Wemaf|20
-KS8A0020009|Yoseph Erlangga Lamere|79
-KS8A0020010|Klementina Fernatyanan|46
-KS8A0020011|Mediana Aziera Jeujanan|69
-KS8A0020015|Vinsensius Edoardus Balubun|37
-KS8B0020001|adriana theresia rahabav|78
-KS8B0020003|Dewanti Sari Jamlean|55
-KS8B0020004|Fabiano B. S. Janjaan|42
-KS8B0020005|Gabriella Ernesta K. Kanarubun|84
-KS8B0020006|Gregorius Higuen Balubun|82
-KS8B0020008|Maria Gratia Maturbongs|88
-KS8B0020010|Oksen Petrus Letsoin|73
-KS8B0020011|Paulina Chelsie Renwarin|64
-KS8B0020016|MARIA STEFANI ATBAR|100
-KS8B0020018|Marwan R. Rahayaan|41
-KS9A0020001|ADRIANUS RAHANAU|27
-KS9A0020003|AMOS RISAL OILIRA|35
-KS9A0020005|VIRGYLIUS M.Y. LEFTUNGUN|42
-KS9A0020009|LEONTINA JEUJANAN|74
-KS9A0020011|MARIA MUTIARA WARAT|53
-KS9A0020016|ROSNATA PUSPITA RENWARIN|29
-KS9A0020017|WELHELMUS RUMANGUN|59
-KS9B0020001|ANDREAS LORENZO TAKERUBUN|64
-KS9B0020002|ALFONSINA OHOIULUN|24
-KS9B0020004|BERNADETA SIAHAYA|28
-KS9B0020008|KRISTINA ANGRENI WELERUBUN|44
-KS9B0020012|MARIA BIN METURAN|66
-KS9B0020014|RONI ANGGARA RAWULUNUBUN|62
-KS9B0020016|SANDRA JEKLIN FARYO|41
-KS9B0020018|YOHANIS MARVEL JAMREVAV|31`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
+        dbUSPW = JSON.parse(localStorage.getItem('dbUSPW')) || [
+            {no_uspw:"SAS27A001", nama:"Agustina Martha Jalnuhubun", kode:"SASKS001"},{no_uspw:"SAS27A002", nama:"Alexa Sherryl Jabar", kode:"SASKS002"},
+            {no_uspw:"SAS27A003", nama:"Billyand Noah Putra Gaga", kode:"SASKS003"},{no_uspw:"SAS27A004", nama:"Apolinaris Kelanit", kode:"SASKS004"},
+            {no_uspw:"SAS27A005", nama:"Aprilia Ela Sirwutubun", kode:"SASKS005"},{no_uspw:"SAS27A006", nama:"Arlinda Metubun", kode:"SASKS006"},
+            {no_uspw:"SAS27A007", nama:"Bois Alfa Ngutra", kode:"SASKS007"},{no_uspw:"SAS27A008", nama:"Dewi Putri Madubun", kode:"SASKS008"},
+            {no_uspw:"SAS27A009", nama:"Elagren Marlatu Lukas Madubun", kode:"SASKS009"},{no_uspw:"SAS27A010", nama:"Fillano Pedrosa Masbaitubun", kode:"SASKS010"},
+            {no_uspw:"SAS27A011", nama:"Gracia Viona Yanyaan", kode:"SASKS011"},{no_uspw:"SAS27A012", nama:"Johanes Obet Bertkat", kode:"SASKS012"},
+            {no_uspw:"SAS27A013", nama:"Jonathan Alvaro Moriolkosu", kode:"SASKS013"},{no_uspw:"SAS27A014", nama:"Katarina Rumangun", kode:"SASKS014"},
+            {no_uspw:"SAS27A015", nama:"Maria Ayu Paisa", kode:"SASKS015"},{no_uspw:"SAS27A016", nama:"Maria Syelena Suripatty Esomar", kode:"SASKS016"},
+            {no_uspw:"SAS27A017", nama:"Maria Theresia Rumangun", kode:"SASKS017"},{no_uspw:"SAS27A018", nama:"Marlina Ingke Balriyanan", kode:"SASKS018"},
+            {no_uspw:"SAS27A019", nama:"Menci Elsina Fantri Karatem", kode:"SASKS019"},{no_uspw:"SAS27A020", nama:"Oktovianus Jamrevav", kode:"SASKS020"},
+            {no_uspw:"SAS27A021", nama:"Reza Dwi Eirlangga Jamlean", kode:"SASKS021"},{no_uspw:"SAS27A022", nama:"Steven Arnold Laumualy", kode:"SASKS022"},
+            {no_uspw:"SAS27A023", nama:"Yohana T Resubun", kode:"SASKS023"},{no_uspw:"SAS27B001", nama:"Agnes Adriana Tawain.", kode:"SASKS024"},
+            {no_uspw:"SAS27B002", nama:"Allmendo Xavi Remetwa.", kode:"SASKS025"},{no_uspw:"SAS27B003", nama:"Alexander Simon Vatubun", kode:"SASKS026"},
+            {no_uspw:"SAS27B004", nama:"Aroby Tamher", kode:"SASKS027"},{no_uspw:"SAS27B005", nama:"Aprilia Lidwina Welikin", kode:"SASKS028"},
+            {no_uspw:"SAS27B006", nama:"Blasius Paskal Dewaut", kode:"SASKS029"},{no_uspw:"SAS27B007", nama:"Chaylen Manis Koedoeboen", kode:"SASKS030"},
+            {no_uspw:"SAS27B008", nama:"Firman Tanarubun", kode:"SASKS031"},{no_uspw:"SAS27B009", nama:"Herlina Abarua", kode:"SASKS032"},
+            {no_uspw:"SAS27B010", nama:"Julius Marzelino Fadirubun", kode:"SASKS033"},{no_uspw:"SAS27B011", nama:"Jumadi Tamher", kode:"SASKS034"},
+            {no_uspw:"SAS27B012", nama:"Kanisius Kebubun", kode:"SASKS035"},{no_uspw:"SAS27B013", nama:"Mintje Glorya Balubun", kode:"SASKS036"},
+            {no_uspw:"SAS27B014", nama:"Margaretha Futubun", kode:"SASKS037"},{no_uspw:"SAS27B015", nama:"Mikha Desire Rukait", kode:"SASKS038"},
+            {no_uspw:"SAS27B016", nama:"Mawar Sharon Kirwelakubun", kode:"SASKS039"},{no_uspw:"SAS27B017", nama:"Nahla Abidin Rahakratat", kode:"SASKS040"},
+            {no_uspw:"SAS27B018", nama:"Penina Rumangun", kode:"SASKS041"},{no_uspw:"SAS27B019", nama:"Rafail Rengur", kode:"SASKS042"},
+            {no_uspw:"SAS27B020", nama:"Udeta Insoraki Rumyaan", kode:"SASKS043"},{no_uspw:"SAS27B021", nama:"Yosep L Takerubun", kode:"SASKS044"},
+            {no_uspw:"SAS27B022", nama:"Maria A. Heatubun", kode:"SASKS045"},{no_uspw:"SAS28A001", nama:"Alinda Ode", kode:"SASKS046"},
+            {no_uspw:"SAS28A002", nama:"Andreas Balubun", kode:"SASKS047"},{no_uspw:"SAS28A003", nama:"Benedicta Petra Akbar", kode:"SASKS048"},
+            {no_uspw:"SAS28A004", nama:"Carolus B. Varis Wemaf", kode:"SASKS049"},{no_uspw:"SAS28A005", nama:"Everets Jiffy Gattu", kode:"SASKS050"},
+            {no_uspw:"SAS28A006", nama:"Filipho Aditya Somnaikubun", kode:"SASKS051"},{no_uspw:"SAS28A007", nama:"Gabriel Alferdo Ubyaan", kode:"SASKS052"},
+            {no_uspw:"SAS28A008", nama:"Giofani Falentino Lutrun", kode:"SASKS053"},{no_uspw:"SAS28A009", nama:"Yoseph Erlangga Lamere", kode:"SASKS054"},
+            {no_uspw:"SAS28A010", nama:"Klementina Fernatyanan", kode:"SASKS055"},{no_uspw:"SAS28A011", nama:"Mediana Aziera Jeujanan", kode:"SASKS056"},
+            {no_uspw:"SAS28A012", nama:"Rahmatia Bugis", kode:"SASKS057"},{no_uspw:"SAS28A013", nama:"Reinal Moriolkosu", kode:"SASKS058"},
+            {no_uspw:"SAS28A014", nama:"Shalmon Antony Rahangmetan", kode:"SASKS059"},{no_uspw:"SAS28A015", nama:"Vinsensius Edoardus Balubun", kode:"SASKS060"},
+            {no_uspw:"SAS28A016", nama:"Welhelmus Zyerzeven Ngarbingan", kode:"SASKS061"},{no_uspw:"SAS28A017", nama:"Marius Rahalus", kode:"SASKS062"},
+            {no_uspw:"SAS28A018", nama:"Harita F. Laritmas", kode:"SASKS063"},{no_uspw:"SAS28A019", nama:"Gracia F. Meterai", kode:"SASKS064"},
+            {no_uspw:"SAS28A020", nama:"Revandi Mukujei", kode:"SASKS065"},{no_uspw:"SAS28B001", nama:"adriana theresia rahabav", kode:"SASKS066"},
+            {no_uspw:"SAS28B002", nama:"Christ Noel Desandro Emyu Souhoka", kode:"SASKS067"},{no_uspw:"SAS28B003", nama:"Dewanti Sari Jamlean", kode:"SASKS068"},
+            {no_uspw:"SAS28B004", nama:"Fabiano B. S. Janjaan", kode:"SASKS069"},{no_uspw:"SAS28B005", nama:"Gabriella Ernesta K. Kanarubun", kode:"SASKS070"},
+            {no_uspw:"SAS28B006", nama:"Gregorius Higuen Balubun", kode:"SASKS071"},{no_uspw:"SAS28B007", nama:"Johanis Charles Woersok", kode:"SASKS072"},
+            {no_uspw:"SAS28B008", nama:"Maria Gratia Maturbongs", kode:"SASKS073"},{no_uspw:"SAS28B009", nama:"Michael Joseph Masbaitubun", kode:"SASKS074"},
+            {no_uspw:"SAS28B010", nama:"Oksen Petrus Letsoin", kode:"SASKS075"},{no_uspw:"SAS28B011", nama:"Paulina Chelsie Renwarin", kode:"SASKS076"},
+            {no_uspw:"SAS28B012", nama:"Restha Jenifer Rahanra", kode:"SASKS077"},{no_uspw:"SAS28B013", nama:"Wensislaus Eko Wemaf", kode:"SASKS078"},
+            {no_uspw:"SAS28B014", nama:"FILIO EMANUEL FAR-FAR", kode:"SASKS079"},{no_uspw:"SAS28B015", nama:"SYANE SELFI RAHANGMETAN", kode:"SASKS080"},
+            {no_uspw:"SAS28B016", nama:"MARIA STEFANI ATBAR", kode:"SASKS081"},{no_uspw:"SAS28B017", nama:"Ronal Regen Rahayaan", kode:"SASKS082"},
+            {no_uspw:"SAS28B018", nama:"Marwan R. Rahayaan", kode:"SASKS083"},{no_uspw:"USP202917", nama:"ADRIANUS RAHANAU", kode:"USPSMP317"},
+            {no_uspw:"USP202918", nama:"ADRIEL CALVINO RENWARIN", kode:"USPSMP318"},{no_uspw:"USP202920", nama:"AMOS RISAL OILIRA", kode:"USPSMP320"},
+            {no_uspw:"USP202921", nama:"ANDREAS LORENZO TAKERUBUN", kode:"USPSMP321"},{no_uspw:"USP202925", nama:"DINDA PELANGI RENHORAN", kode:"USPSMP325"},
+            {no_uspw:"USP202927", nama:"INTAN MASAHIDA", kode:"USPSMP327"},{no_uspw:"USP202929", nama:"ISRAEL ABRISYE RAHAKBAUW", kode:"USPSMP329"},
+            {no_uspw:"USP202934", nama:"MARCELINO ALDO RENYAAN", kode:"USPSMP334"},{no_uspw:"USP202937", nama:"MARIANUS NGARBINGAN", kode:"USPSMP337"},
+            {no_uspw:"USP202943", nama:"NILAM MARSDA WABULA", kode:"USPSMP343"},{no_uspw:"USP202945", nama:"ROBBEN JAKOBUS OHOILEDJAAN", kode:"USPSMP345"},
+            {no_uspw:"USP202949", nama:"VIRGYLIUS MATHIAS YAHYA LEFTUNGUN", kode:"USPSMP349"},{no_uspw:"USP202954", nama:"YOHANIS MARVEL JAMREWAV", kode:"USPSMP354"},
+            {no_uspw:"USP202919", nama:"ALFONSINA OHOIULUN", kode:"USPSMP319"},{no_uspw:"USP202923", nama:"BERNADETA SIAHAYA", kode:"USPSMP323"},
+            {no_uspw:"USP202926", nama:"GIDION LEFTA", kode:"USPSMP326"},{no_uspw:"USP202930", nama:"KEANO MACKENZIE RAHAJAAN", kode:"USPSMP330"},
+            {no_uspw:"USP202931", nama:"KRISTINA ANGRENI WELERUBUN", kode:"USPSMP331"},{no_uspw:"USP202933", nama:"LEONTINA JEUJANAN", kode:"USPSMP333"},
+            {no_uspw:"USP202935", nama:"MARIA BIN MATURAN", kode:"USPSMP335"},{no_uspw:"USP202944", nama:"RACHEL MICHEL TARANTEIN", kode:"USPSMP344"},
+            {no_uspw:"USP202938", nama:"MARTHA MELSASAIL", kode:"USPSMP338"},{no_uspw:"USP202946", nama:"RONI ANGGARA RAWULUNUBUN", kode:"USPSMP346"},
+            {no_uspw:"USP202947", nama:"ROSNATA PUSPITA RENWARIN", kode:"USPSMP347"},{no_uspw:"USP202948", nama:"SANDRA JACLINA FAIRYO", kode:"USPSMP348"},
+            {no_uspw:"USP202950", nama:"WELHELMUS RAHALOB", kode:"USPSMP350"},{no_uspw:"USP202956", nama:"ZULKIFLI RAHAKBAUW", kode:"USPSMP356"},
+            {no_uspw:"USP202922", nama:"AZAN AKBAR TUKLOY", kode:"USPSMP322"},{no_uspw:"USP202924", nama:"DIANA HERMINA HUWAE", kode:"USPSMP324"},
+            {no_uspw:"USP202928", nama:"INTAN RAHAKBAUW", kode:"USPSMP328"},{no_uspw:"USP202932", nama:"LANA  RIECHEL LABOBAR", kode:"USPSMP332"},
+            {no_uspw:"USP202936", nama:"MARIA MUTIARA WARAT", kode:"USPSMP336"},{no_uspw:"USP202939", nama:"MELATI AUREL ROSYADI", kode:"USPSMP339"},
+            {no_uspw:"USP202940", nama:"MICHAELA PRINCESSA DEBORA TAPOTUBUN", kode:"USPSMP340"},{no_uspw:"USP202941", nama:"MUSA EFRUAN", kode:"USPSMP341"},
+            {no_uspw:"USP202942", nama:"NADYA HOEKOEBOEN", kode:"USPSMP342"},{no_uspw:"USP202951", nama:"WIDY CLEANDRA AZAZYA JABAR", kode:"USPSMP351"},
+            {no_uspw:"USP202952", nama:"WILHELMUS RUMANGUN", kode:"USPSMP352"},{no_uspw:"USP202953", nama:"WILIN NOTANUBUN", kode:"USPSMP353"},
+            {no_uspw:"USP202955", nama:"YOHANIS MESSI EFRUAN", kode:"USPSMP355"}
+        ];
 
-// Bahasa Inggris (123 siswa)
-const BG=`KS7A0020001|Agustina Martha Jalnuhubun|0
-KS7A0020002|Alexa Sherryl Jabar|77
-KS7A0020003|Billyand Noah Putra Gaga|58
-KS7A0020004|Apolinaris Kelanit|57
-KS7A0020005|Aprilia Ela Sirwutubun|57
-KS7A0020006|Arlinda Metubun|52
-KS7A0020007|Bois Alfa Ngutra|35
-KS7A0020008|Dewi Putri Madubun|43
-KS7A0020009|Elagren Marlatu Lukas Madubun|41
-KS7A0020010|Fillano Pedrosa Masbaitubun|38
-KS7A0020011|Gracia Viona Yanyaan|58
-KS7A0020012|Johanes Obet Bertkat|61
-KS7A0020013|Jonathan Alvaro Moriolkosu|51
-KS7A0020014|Katarina Rumangun|0
-KS7A0020015|Maria Ayu Paisa|42
-KS7A0020016|Maria Syelena Suripatty Esomar|55
-KS7A0020017|Maria Theresia Rumangun|81
-KS7A0020018|Marlina Ingke Balriyanan|72
-KS7A0020019|Menci Elsina Fantri Karatem|72
-KS7A0020020|Oktovianus Jamrevav|53
-KS7A0020021|Reza Dwi Eirlangga Jamlean|0
-KS7A0020022|Steven Arnold Laumualy|40
-KS7A0020023|Yohana T Resubun|71
-KS7B0020001|Agnes Adriana Tawain.|42
-KS7B0020002|Allmendo Xavi Remetwa.|59
-KS7B0020003|Alexander Simon Vatubun.|40
-KS7B0020004|Aroby Tamher|43
-KS7B0020005|Aprilia Lidwina Welikin|49
-KS7B0020006|Alexander Simon Vatubun|0
-KS7B0020007|Chaylen Manis Koedoeboen|41
-KS7B0020008|Firman Tanarubun|34
-KS7B0009|Herlina Abarua|33
-KS7B0010|Julius Marzelino Fadirubun|61
-KS7B0011|Jumadi Tamher|57
-KS7B0012|Kanisius Kebubun|0
-KS7B0013|Mintje Glorya Balubun|39
-KS7B0014|Margaretha Futubun|39
-KS7B0015|Mikha Desire Rukait|76
-KS7B0016|Mawar Sharon Kirwelakubun|63
-KS7B0017|Nahla Abidin Rahakratat|36
-KS7B0018|Penina Rumangun|66
-KS7B0019|Rafail Rengur|38
-KS7B0020|Udeta Insoraki Rumyaan|55
-KS7B0021|Yosep L Takerubun|34
-KS7B0022|Maria A. Heatubun|34
-KS8A0020001|Alinda Ode|35
-KS8A000002|Andreas Balubun|42
-KS8A000003|Benedicta Petra Akbar|34
-KS8A000004|Carolus B. Varis Wemaf|44
-KS8A000005|Everets Jiffy Gattu|61
-KS8A000006|Gregorius Higuen Balubun|46
-KS8A000007|Johanis Charles Woersok|0
-KS8A000008|Maria Gratia Maturbongs|0
-KS8A000009|Yoseph Erlangga Lamere|0
-KS8A000010|Klementina Fernatyanan|28
-KS8A000011|Mediana Aziera Jeujanan|35
-KS8A000012|Rahmatia Bugis|24
-KS8A000013|Reinal Moriolkosu|62
-KS8A000014|Shalmon Antony Rahangmetan|67
-KS8A000015|Vinsensius Edoardus Balubun|41
-KS8A000016|Welhelmus Zyerzeven Ngarbingan|23
-KS8A000017|Ronal Regen Rahayaan|52
-KS8A000018|Harita F. Laritmas|0
-KS8A000019|Gracia F. Meterai|0
-KS8A000020|Revandi Mukujei|52
-KS8B000001|adriana theresia rahabav|50
-KS8B000002|Christ Noel Desandro Emyu Souhoka|25
-KS8B000003|Dewanti Sari Jamlean|20
-KS8B000004|Fabiano B. S. Janjaan|51
-KS8B000005|Gabriella Ernesta K. Kanarubun|28
-KS8B000006|Gregorius Higuen Balubun|20
-KS8B000007|Johanis Charles Woersok|0
-KS8B000008|Maria Gratia Maturbongs|22
-KS8B000009|Michael Joseph Masbaitubun|74
-KS8B000010|Oksen Petrus Letsoin|43
-KS8B000011|Paulina Chelsie Renwarin|27
-KS8B000012|Restha Jenifer Rahanra|26
-KS8B000013|Wensislaus Eko Wemaf|31
-KS8B000014|FILIO EMANUEL FAR-FAR|20
-KS8B000015|SYANE SELFI RAHANGMETAN|80
-KS8B000016|MARIA STEFANI ATBAR|38
-KS8B000017|Ronal Regen Rahayaan|0
-KS8B000018|Marwan R. Rahayaan|43
-KS9A000001|ADRIANUS RAHANAU|28
-KS9A000002|ADRIEL CALVINO RENWARIN|31
-KS9A000003|AMOS RISAL OILIRA|46
-KS9A000004|DIANA HERMINA HUAWAE|53
-KS9A000005|VIRGYLIUS M.Y. LEFTUNGUN|42
-KS9A000006|GIDION LEFTA|42
-KS9A000007|INTAN RAHAKBAUW|72
-KS9A000008|KEANO MACKENZIE RAHAJAAN|57
-KS9A000009|LEONTINA JEUJANAN|84
-KS9A000010|MARCELINO ALDO RENYAAN|29
-KS9A000011|MARIA MUTIARA WARAT|53
-KS9A000012|MELATI AUREL ROSYADI|37
-KS9A000013|MICHAELA P. D. TAPOTUBUN|90
-KS9A000014|NILAM MARSDA WABULA|40
-KS9A000015|ROBBEN JAKOBUS OHOILEDJAAN|0
-KS9A000016|ROSNATA PUSPITA RENWARIN|26
-KS9A000017|WELHELMUS RUMANGUN|76
-KS9A000018|WIDY CLEANDRA AZAZYA JABAR|84
-KS9A000019|WILIN NOTANUBUN|48
-KS9A000020|LANA RIECEL LABOBAR|42
-KS9B000001|ANDREAS LORENZO TAKERUBUN|44
-KS9B000002|ALFONSINA OHOIULUN|33
-KS9B000003|AZAN AKBAR TUKLOY|41
-KS9B000004|BERNADETA SIAHAYA|30
-KS9B000005|DINDA PELANGI RENHORAN|56
-KS9B000006|INTAN MASAHIDA|55
-KS9B000007|ISRAEL. ABRISYE LABETUBUN|0
-KS9B000008|KRISTINA ANGRENI WELERUBUN|33
-KS9B000009|MARIANUS NGARBINGAN|0
-KS9B000010|MARTHA MELSASAIL|054
-KS9B000011|MUSA EFRUAN|49
-KS9B000012|MARIA BIN METURAN|39
-KS9B000013|NADYA HOEKOEBOEN|84
-KS9B000014|RONI ANGGARA RAWULUNUBUN|31
-KS9B000015|RAHEL M TARANTEIN|88
-KS9B000016|SANDRA JEKLIN FARYO|25
-KS9B000017|YOHANIS MESI EFRUAN|0
-KS9B000018|YOHANIS MARVEL JAMREVAV|47
-KS9B000019|WILHELMUS RAHALOB|0
-KS9B000020|ZULKIFLI RAHAKBAUW|0`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
-
-
-// PKn (123 siswa)
-const PK=`KS7A0020001|Agustina Martha Jalnuhubun|0
-KS7A0020002|Alexa Sherryl Jabar|80
-KS7A0020003|Billyand Noah Putra Gaga|76
-KS7A0020004|Apolinaris Kelanit|80
-KS7A0020005|Aprilia Ela Sirwutubun|75
-KS7A0020006|Arlinda Metubun|84
-KS7A0020007|Bois Alfa Ngutra|71
-KS7A0020008|Dewi Putri Madubun|84
-KS7A0020009|Elagren Marlatu Lukas Madubun|63
-KS7A0020010|Fillano Pedrosa Masbaitubun|69
-KS7A0020011|Gracia Viona Yanyaan|65
-KS7A0020012|Johanes Obet Bertkat|76
-KS7A0020013|Jonathan Alvaro Moriolkosu|71
-KS7A0020014|Katarina Rumangun|0
-KS7A0020015|Maria Ayu Paisa|78
-KS7A0020016|Maria Syelena Suripatty Esomar|82
-KS7A0020017|Maria Theresia Rumangun|86
-KS7A0020018|Marlina Ingke Balriyanan|78
-KS7A0020019|Menci Elsina Fantri Karatem|77
-KS7A0020020|Oktovianus Jamrevav|68
-KS7A0020021|Reza Dwi Eirlangga Jamlean|0
-KS7A0020022|Steven Arnold Laumualy|72
-KS7A0020023|Yohana T Resubun|78
-KS7B0020001|Agnes Adriana Tawain.|86
-KS7B0020002|Allmendo Xavi Remetwa.|81
-KS7B0020003|Alexander Simon Vatubun.|48
-KS7B0020004|Aroby Tamher|84
-KS7B0020005|Aprilia Lidwina Welikin|74
-KS7B0020006|Alexander Simon Vatubun|0
-KS7B0020007|Chaylen Manis Koedoeboen|69
-KS7B0020008|Firman Tanarubun|35
-KS7B0009|Herlina Abarua|80
-KS7B0010|Julius Marzelino Fadirubun|67
-KS7B0011|Jumadi Tamher|70
-KS7B0012|Kanisius Kebubun|0
-KS7B0013|Mintje Glorya Balubun|76
-KS7B0014|Margaretha Futubun|34
-KS7B0015|Mikha Desire Rukait|84
-KS7B0016|Mawar Sharon Kirwelakubun|86
-KS7B0017|Nahla Abidin Rahakratat|86
-KS7B0018|Penina Rumangun|82
-KS7B0019|Rafail Rengur|86
-KS7B0020|Udeta Insoraki Rumyaan|76
-KS7B0021|Yosep L Takerubun|57
-KS7B0022|Maria A. Heatubun|78
-KS8A000001|Alinda Ode|71
-KS8A000002|Andreas Balubun|34
-KS8A000003|Benedicta Petra Akbar|86
-KS8A000004|Carolus B. Varis Wemaf|49
-KS8A000005|Everets Jiffy Gattu|75
-KS8A000006|Gregorius Higuen Balubun|82
-KS8A000007|Johanis Charles Woersok|0
-KS8A000008|Maria Gratia Maturbongs|0
-KS8A000009|Yoseph Erlangga Lamere|79
-KS8A000010|Klementina Fernatyanan|66
-KS8A000011|Mediana Aziera Jeujanan|76
-KS8A000012|Rahmatia Bugis|81
-KS8A000013|Reinal Moriolkosu|70
-KS8A000014|Shalmon Antony Rahangmetan|79
-KS8A000015|Vinsensius Edoardus Balubun|37
-KS8A000016|Welhelmus Zyerzeven Ngarbingan|63
-KS8A000017|Ronal Regen Rahayaan|81
-KS8A000018|Harita F. Laritmas|63
-KS8A000019|Gracia F. Meterai|0
-KS8A000020|Revandi Mukujei|38
-KS8B000001|adriana theresia rahabav|78
-KS8B000002|Christ Noel Desandro Emyu Souhoka|86
-KS8B000003|Dewanti Sari Jamlean|54
-KS8B000004|Fabiano B. S. Janjaan|53
-KS8B000005|Gabriella Ernesta K. Kanarubun|21
-KS8B000006|Gregorius Higuen Balubun|81
-KS8B000007|Johanis Charles Woersok|63
-KS8B000008|Maria Gratia Maturbongs|86
-KS8B000009|Michael Joseph Masbaitubun|81
-KS8B000010|Oksen Petrus Letsoin|67
-KS8B000011|Paulina Chelsie Renwarin|79
-KS8B000012|Restha Jenifer Rahanra|59
-KS8B000013|Wensislaus Eko Wemaf|44
-KS8B000014|FILIO EMANUEL FAR-FAR|66
-KS8B000015|SYANE SELFI RAHANGMETAN|78
-KS8B000016|MARIA STEFANI ATBAR|70
-KS8B000017|Ronal Regen Rahayaan|0
-KS8B000018|Marwan R. Rahayaan|32
-KS9A000001|ADRIANUS RAHANAU|55
-KS9A000002|ADRIEL CALVINO RENWARIN|61
-KS9A000003|AMOS RISAL OILIRA|68
-KS9A000004|DIANA HERMINA HUAWAE|87
-KS9A000005|VIRGYLIUS M.Y. LEFTUNGUN|76
-KS9A000006|GIDION LEFTA|43
-KS9A000007|INTAN RAHAKBAUW|93
-KS9A000008|KEANO MACKENZIE RAHAJAAN|78
-KS9A000009|LEONTINA JEUJANAN|93
-KS9A000010|MARCELINO ALDO RENYAAN|80
-KS9A000011|MARIA MUTIARA WARAT|68
-KS9A000012|MELATI AUREL ROSYADI|93
-KS9A000013|MICHAELA P. D. TAPOTUBUN|93
-KS9A000014|NILAM MARSDA WABULA|62
-KS9A000015|ROBBEN JAKOBUS OHOILEDJAAN|0
-KS9A000016|ROSNATA PUSPITA RENWARIN|44
-KS9A000017|WELHELMUS RUMANGUN|93
-KS9A000018|WIDY CLEANDRA AZAZYA JABAR|86
-KS9A000019|WILIN NOTANUBUN|86
-KS9A000020|LANA RIECEL LABOBAR|80
-KS9B000001|ANDREAS LORENZO TAKERUBUN|75
-KS9B000002|ALFONSINA OHOIULUN|56
-KS9B000003|AZAN AKBAR TUKLOY|57
-KS9B000004|BERNADETA SIAHAYA|46
-KS9B000005|DINDA PELANGI RENHORAN|84
-KS9B000006|INTAN MASAHIDA|87
-KS9B000007|ISRAEL. ABRISYE LABETUBUN|0
-KS9B000008|KRISTINA ANGRENI WELERUBUN|73
-KS9B000009|MARIANUS NGARBINGAN|0
-KS9B000010|MARTHA MELSASAIL|82
-KS9B000011|MUSA EFRUAN|81
-KS9B000012|MARIA BIN METURAN|89
-KS9B000013|NADYA HOEKOEBOEN|87
-KS9B000014|RONI ANGGARA RAWULUNUBUN|68
-KS9B000015|RAHEL M TARANTEIN|86
-KS9B000016|SANDRA JEKLIN FARYO|55
-KS9B000017|YOHANIS MESI EFRUAN|0
-KS9B000018|YOHANIS MARVEL JAMREVAV|57
-KS9B000019|WILHELMUS RAHALOB|0
-KS9B000020|ZULKIFLI RAHAKBAUW|0`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
-
-// IPA (123 siswa)
-const PA=`KS7A0020001|Agustina Martha Jalnuhubun|0
-KS7A0020002|Alexa Sherryl Jabar|10
-KS7A0020003|Billyand Noah Putra Gaga|20
-KS7A0020004|Apolinaris Kelanit|10
-KS7A0020005|Aprilia Ela Sirwutubun|20
-KS7A0020006|Arlinda Metubun|10
-KS7A0020007|Bois Alfa Ngutra|10
-KS7A0020008|Dewi Putri Madubun|10
-KS7A0020009|Elagren Marlatu Lukas Madubun|10
-KS7A0020010|Fillano Pedrosa Masbaitubun|10
-KS7A0020011|Gracia Viona Yanyaan|20
-KS7A0020012|Johanes Obet Bertkat|20
-KS7A0020013|Jonathan Alvaro Moriolkosu|10
-KS7A0020014|Katarina Rumangun|0
-KS7A0020015|Maria Ayu Paisa|0
-KS7A0020016|Maria Syelena Suripatty Esomar|30
-KS7A0020017|Maria Theresia Rumangun|20
-KS7A0020018|Marlina Ingke Balriyanan|20
-KS7A0020019|Menci Elsina Fantri Karatem|20
-KS7A0020020|Oktovianus Jamrevav|20
-KS7A0020021|Reza Dwi Eirlangga Jamlean|0
-KS7A0020022|Steven Arnold Laumualy|20
-KS7A0020023|Yohana T Resubun|20
-KS7B0020001|Agnes Adriana Tawain.|20
-KS7B0020002|Allmendo Xavi Remetwa.|0
-KS7B0020003|Alexander Simon Vatubun.|10
-KS7B0020004|Aroby Tamher|30
-KS7B0020005|Aprilia Lidwina Welikin|20
-KS7B0020006|Alexander Simon Vatubun|0
-KS7B0020007|Chaylen Manis Koedoeboen|30
-KS7B0020008|Firman Tanarubun|0
-KS7B0009|Herlina Abarua|20
-KS7B0010|Julius Marzelino Fadirubun|10
-KS7B0011|Jumadi Tamher|10
-KS7B0012|Kanisius Kebubun|0
-KS7B0013|Mintje Glorya Balubun|30
-KS7B0014|Margaretha Futubun|0
-KS7B0015|Mikha Desire Rukait|30
-KS7B0016|Mawar Sharon Kirwelakubun|20
-KS7B0017|Nahla Abidin Rahakratat|20
-KS7B0018|Penina Rumangun|30
-KS7B0019|Rafail Rengur|20
-KS7B0020|Udeta Insoraki Rumyaan|20
-KS7B0021|Yosep L Takerubun|20
-KS7B0022|Maria A. Heatubun|30
-KS8A000001|Alinda Ode|67
-KS8A000002|Andreas Balubun|21
-KS8A000003|Benedicta Petra Akbar|30
-KS8A000004|Carolus B. Varis Wemaf|25
-KS8A000005|Everets Jiffy Gattu|33
-KS8A000006|Gregorius Higuen Balubun|25
-KS8A000007|Johanis Charles Woersok|0
-KS8A000008|Maria Gratia Maturbongs|0
-KS8A000009|Yoseph Erlangga Lamere|30
-KS8A000010|Klementina Fernatyanan|19
-KS8A000011|Mediana Aziera Jeujanan|57
-KS8A000012|Rahmatia Bugis|29
-KS8A000013|Reinal Moriolkosu|32
-KS8A000014|Shalmon Antony Rahangmetan|24
-KS8A000015|Vinsensius Edoardus Balubun|40
-KS8A000016|Welhelmus Zyerzeven Ngarbingan|15
-KS8A000017|Ronal Regen Rahayaan|28
-KS8A000018|Harita F. Laritmas|55
-KS8A000019|Gracia F. Meterai|0
-KS8A000020|Revandi Mukujei|18
-KS8B000001|adriana theresia rahabav|27
-KS8B000002|Christ Noel Desandro Emyu Souhoka|36
-KS8B000003|Dewanti Sari Jamlean|24
-KS8B000004|Fabiano B. S. Janjaan|17
-KS8B000005|Gabriella Ernesta K. Kanarubun|44
-KS8B000006|Gregorius Higuen Balubun|29
-KS8B000007|Johanis Charles Woersok|28
-KS8B000008|Maria Gratia Maturbongs|46
-KS8B000009|Michael Joseph Masbaitubun|53
-KS8B000010|Oksen Petrus Letsoin|13
-KS8B000011|Paulina Chelsie Renwarin|26
-KS8B000012|Restha Jenifer Rahanra|30
-KS8B000013|Wensislaus Eko Wemaf|34
-KS8B000014|FILIO EMANUEL FAR-FAR|18
-KS8B000015|SYANE SELFI RAHANGMETAN|23
-KS8B000016|MARIA STEFANI ATBAR|13
-KS8B000017|Ronal Regen Rahayaan|0
-KS8B000018|Marwan R. Rahayaan|32
-KS9A000001|ADRIANUS RAHANAU|30
-KS9A000002|ADRIEL CALVINO RENWARIN|39
-KS9A000003|AMOS RISAL OILIRA|10
-KS9A000004|DIANA HERMINA HUAWAE|31
-KS9A000005|VIRGYLIUS M.Y. LEFTUNGUN|55
-KS9A000006|GIDION LEFTA|33
-KS9A000007|INTAN RAHAKBAUW|30
-KS9A000008|KEANO MACKENZIE RAHAJAAN|33
-KS9A000009|LEONTINA JEUJANAN|41
-KS9A000010|MARCELINO ALDO RENYAAN|29
-KS9A000011|MARIA MUTIARA WARAT|12
-KS9A000012|MELATI AUREL ROSYADI|27
-KS9A000013|MICHAELA P. D. TAPOTUBUN|31
-KS9A000014|NILAM MARSDA WABULA|20
-KS9A000015|ROBBEN JAKOBUS OHOILEDJAAN|0
-KS9A000016|ROSNATA PUSPITA RENWARIN|16
-KS9A000017|WELHELMUS RUMANGUN|35
-KS9A000018|WIDY CLEANDRA AZAZYA JABAR|30
-KS9A000019|WILIN NOTANUBUN|16
-KS9A000020|LANA RIECEL LABOBAR|49
-KS9B000001|ANDREAS LORENZO TAKERUBUN|24
-KS9B000002|ALFONSINA OHOIULUN|27
-KS9B000003|AZAN AKBAR TUKLOY|40
-KS9B000004|BERNADETA SIAHAYA|39
-KS9B000005|DINDA PELANGI RENHORAN|33
-KS9B000006|INTAN MASAHIDA|35
-KS9B000007|ISRAEL. ABRISYE LABETUBUN|0
-KS9B000008|KRISTINA ANGRENI WELERUBUN|39
-KS9B000009|MARIANUS NGARBINGAN|0
-KS9B000010|MARTHA MELSASAIL|46
-KS9B000011|MUSA EFRUAN|40
-KS9B000012|MARIA BIN METURAN|18
-KS9B000013|NADYA HOEKOEBOEN|28
-KS9B000014|RONI ANGGARA RAWULUNUBUN|30
-KS9B000015|RAHEL M TARANTEIN|32
-KS9B000016|SANDRA JEKLIN FARYO|21
-KS9B000017|YOHANIS MESI EFRUAN|36
-KS9B000018|YOHANIS MARVEL JAMREVAV|35
-KS9B000019|WILHELMUS RAHALOB|0
-KS9B000020|ZULKIFLI RAHAKBAUW|46`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
-
-
-// Agama Islam (13 siswa)
-const AI=`KS7B000004|Aroby Tamher|96
-KS7B000008|Firman Tanarubun|42
-KS7B000011|Jumadi Tamher|50
-KS7B000014|Margaretha Futubun|44
-KS7B000017|Nahla Abidin Rahakratat|88
-KS8A000001|Alinda Ode|65
-KS8A000012|Rahmatia Bugis|67
-KS8B000018|Marwan R. Rahayaan|35
-KS9A000012|MELATI AUREL ROSYADI|92
-KS9A000014|NILAM MARSDA WABULA|86
-KS9B000003|AZAN AKBAR TUKLOY|80
-KS9B000005|DINDA PELANGI RENHORAN|92
-KS9B000006|INTAN MASAHIDA|92`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
-
-// Matematika (123 siswa)
-const MT=`KS7A0020001|Agustina Martha Jalnuhubun|0
-KS7A0020002|Alexa Sherryl Jabar|60
-KS7A0020003|Billyand Noah Putra Gaga|60
-KS7A0020004|Apolinaris Kelanit|63
-KS7A0020005|Aprilia Ela Sirwutubun|29
-KS7A0020006|Arlinda Metubun|39
-KS7A0020007|Bois Alfa Ngutra|24
-KS7A0020008|Dewi Putri Madubun|42
-KS7A0020009|Elagren Marlatu Lukas Madubun|26
-KS7A0020010|Fillano Pedrosa Masbaitubun|29
-KS7A0020011|Gracia Viona Yanyaan|40
-KS7A0020012|Johanes Obet Bertkat|42
-KS7A0020013|Jonathan Alvaro Moriolkosu|45
-KS7A0020014|Katarina Rumangun|0
-KS7A0020015|Maria Ayu Paisa|53
-KS7A0020016|Maria Syelena Suripatty Esomar|45
-KS7A0020017|Maria Theresia Rumangun|38
-KS7A0020018|Marlina Ingke Balriyanan|44
-KS7A0020019|Menci Elsina Fantri Karatem|58
-KS7A0020020|Oktovianus Jamrevav|22
-KS7A0020021|Reza Dwi Eirlangga Jamlean|0
-KS7A0020022|Steven Arnold Laumualy|43
-KS7A0020023|Yohana T Resubun|50
-KS7B0020001|Agnes Adriana Tawain.|60
-KS7B0020002|Allmendo Xavi Remetwa.|55
-KS7B0020003|Alexander Simon Vatubun.|21
-KS7B0020004|Aroby Tamher|29
-KS7B0020005|Aprilia Lidwina Welikin|0
-KS7B0020006|Blasius Paskal Dewaut|0
-KS7B0020007|Chaylen Manis Koedoeboen|40
-KS7B0020008|Firman Tanarubun|31
-KS7B0009|Herlina Abarua|31
-KS7B0010|Julius Marzelino Fadirubun|32
-KS7B0011|Jumadi Tamher|30
-KS7B0012|Kanisius Kebubun|0
-KS7B0013|Mintje Glorya Balubun|26
-KS7B0014|Margaretha Futubun|13
-KS7B0015|Mikha Desire Rukait|53
-KS7B0016|Mawar Sharon Kirwelakubun|40
-KS7B0017|Nahla Abidin Rahakratat|34
-KS7B0018|Penina Rumangun|39
-KS7B0019|Rafail Rengur|48
-KS7B0020|Udeta Insoraki Rumyaan|34
-KS7B0021|Yosep L Takerubun|31
-KS7B0022|Maria A. Heatubun|22
-KS8A000001|Alinda Ode|70
-KS8A000002|Andreas Balubun|79
-KS8A000003|Benedicta Petra Akbar|72
-KS8A000004|Carolus B. Varis Wemaf|42
-KS8A000005|Everets Jiffy Gattu|62
-KS8A000006|Gregorius Higuen Balubun|57
-KS8A000007|Johanis Charles Woersok|0
-KS8A000008|Maria Gratia Maturbongs|0
-KS8A000009|Yoseph Erlangga Lamere|56
-KS8A000010|Klementina Fernatyanan|59
-KS8A000011|Mediana Aziera Jeujanan|74
-KS8A000012|Rahmatia Bugis|64
-KS8A000013|Reinal Moriolkosu|79
-KS8A000014|Shalmon Antony Rahangmetan|72
-KS8A000015|Vinsensius Edoardus Balubun|12
-KS8A000016|Welhelmus Zyerzeven Ngarbingan|46
-KS8A000017|Ronal Regen Rahayaan|54
-KS8A000018|Harita F. Laritmas|62
-KS8A000019|Gracia F. Meterai|0
-KS8A000020|Revandi Mukujei|37
-KS8B000001|adriana theresia rahabav|43
-KS8B000002|Christ Noel Desandro Emyu Souhoka|73
-KS8B000003|Dewanti Sari Jamlean|40
-KS8B000004|Fabiano B. S. Janjaan|21
-KS8B000005|Gabriella Ernesta K. Kanarubun|47
-KS8B000006|Gregorius Higuen Balubun|49
-KS8B000007|Johanis Charles Woersok|58
-KS8B000008|Maria Gratia Maturbongs|78
-KS8B000009|Michael Joseph Masbaitubun|72
-KS8B000010|Oksen Petrus Letsoin|52
-KS8B000011|Paulina Chelsie Renwarin|43
-KS8B000012|Restha Jenifer Rahanra|45
-KS8B000013|Wensislaus Eko Wemaf|34
-KS8B000014|FILIO EMANUEL FAR-FAR|53
-KS8B000015|SYANE SELFI RAHANGMETAN|45
-KS8B000016|MARIA STEFANI ATBAR|62
-KS8B000017|Ronal Regen Rahayaan|0
-KS8B000018|Marwan R. Rahayaan|26
-KS9A000001|ADRIANUS RAHANAU|45
-KS9A000002|ADRIEL CALVINO RENWARIN|43
-KS9A000003|AMOS RISAL OILIRA|52
-KS9A000004|DIANA HERMINA HUAWAE|45
-KS9A000005|VIRGYLIUS M.Y. LEFTUNGUN|31
-KS9A000006|GIDION LEFTA|38
-KS9A000007|INTAN RAHAKBAUW|64
-KS9A000008|KEANO MACKENZIE RAHAJAAN|58
-KS9A000009|LEONTINA JEUJANAN|70
-KS9A000010|MARCELINO ALDO RENYAAN|50
-KS9A000011|MARIA MUTIARA WARAT|72
-KS9A000012|MELATI AUREL ROSYADI|65
-KS9A000013|MICHAELA P. D. TAPOTUBUN|70
-KS9A000014|NILAM MARSDA WABULA|54
-KS9A000015|ROBBEN JAKOBUS OHOILEDJAAN|0
-KS9A000016|ROSNATA PUSPITA RENWARIN|35
-KS9A000017|WELHELMUS RUMANGUN|77
-KS9A000018|WIDY CLEANDRA AZAZYA JABAR|70
-KS9A000019|WILIN NOTANUBUN|72
-KS9A000020|LANA RIECEL LABOBAR|61
-KS9B000001|ANDREAS LORENZO TAKERUBUN|67
-KS9B000002|ALFONSINA OHOIULUN|25
-KS9B000003|AZAN AKBAR TUKLOY|41
-KS9B000004|BERNADETA SIAHAYA|28
-KS9B000005|DINDA PELANGI RENHORAN|74
-KS9B000006|INTAN MASAHIDA|0
-KS9B000007|ISRAEL. ABRISYE LABETUBUN|0
-KS9B000008|KRISTINA ANGRENI WELERUBUN|44
-KS9B000009|MARIANUS NGARBINGAN|0
-KS9B000010|MARTHA MELSASAIL|51
-KS9B000011|MUSA EFRUAN|67
-KS9B000012|MARIA BIN METURAN|48
-KS9B000013|NADYA HOEKOEBOEN|65
-KS9B000014|RONI ANGGARA RAWULUNUBUN|0
-KS9B000015|RAHEL M TARANTEIN|69
-KS9B000016|SANDRA JEKLIN FARYO|45
-KS9B000017|YOHANIS MESI EFRUAN|35
-KS9B000018|YOHANIS MARVEL JAMREVAV|0
-KS9B000019|WILHELMUS RAHALOB|0
-KS9B000020|ZULKIFLI RAHAKBAUW|53`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
-
-
-// Agama Protestan (50 siswa)
-const AP=`KS7A0020002|Alexa Sherryl Jabar|85
-KS7A0020003|Billyand Noah Putra Gaga|79
-KS7A0020006|Arlinda Metubun|71
-KS7A0020007|Bois Alfa Ngutra|81
-KS7A0020008|Dewi Putri Madubun|81
-KS7A0020009|Elagren Marlatu Lukas Madubun|74
-KS7A0020010|Fillano Pedrosa Masbaitubun|70
-KS7A0020012|Johanes Obet Bertkat|65
-KS7A0020013|Jonathan Alvaro Moriolkosu|83
-KS7A0020019|Menci Elsina Fantri Karatem|88
-KS7A0020022|Steven Arnold Laumualy|50
-KS7B0020001|Agnes Adriana Tawain.|82
-KS7B0020003|Alexander Simon Vatubun.|39
-KS7B0020007|Chaylen Manis Koedoeboen|73
-KS7B0020009|Herlina Abarua|70
-KS7B0020013|Mintje Glorya Balubun|75
-KS7B0020014|Margaretha Futubun|32
-KS7B0020015|Mikha Desire Rukait|88
-KS7B0020019|Rafail Rengur|61
-KS8A0020001|Alinda Ode|69.5
-KS8A000005|Everets Jiffy Gattu|81
-KS8A000006|Gregorius Higuen Balubun|57
-KS8A000013|Reinal Moriolkosu|69
-KS8A000014|Shalmon Antony Rahangmetan|83
-KS8A000016|Welhelmus Zyerzeven Ngarbingan|41.5
-KS8A000018|Harita F. Laritmas|57.5
-KS8A000020|Revandi Mukujei|59
-KS8B000002|Christ Noel Desandro Emyu Souhoka|80
-KS8B000007|Johanis Charles Woersok|82
-KS8B000009|Michael Joseph Masbaitubun|89
-KS8B000012|Restha Jenifer Rahanra|52
-KS8B000014|FILIO EMANUEL FAR-FAR|49
-KS8B000015|SYANE SELFI RAHANGMETAN|85
-KS8B000016|MARIA STEFANI ATBAR|62
-KS9A000002|ADRIEL CALVINO RENWARIN|63
-KS9A000003|AMOS RISAL OILIRA|65
-KS9A000004|DIANA HERMINA HUAWAE|76
-KS9A000006|GIDION LEFTA|41
-KS9A000007|INTAN RAHAKBAUW|88
-KS9A000008|KEANO MACKENZIE RAHAJAAN|78
-KS9A000010|MARCELINO ALDO RENYAAN|70
-KS9A000013|MICHAELA P. D. TAPOTUBUN|82
-KS9A000018|WIDY CLEANDRA AZAZYA JABAR|82
-KS9A000019|WILIN NOTANUBUN|83
-KS9A000020|LANA RIECEL LABOBAR|74
-KS9B000010|MARTHA MELSASAIL|75
-KS9B000011|MUSA EFRUAN|82
-KS9B000013|NADYA HOEKOEBOEN|78
-KS9B000015|RAHEL M TARANTEIN|78
-KS9B000020|ZULKIFLI RAHAKBAUW|51`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
-
-// PJOK (123 siswa)
-const PJ=`KS7A0020001|Agustina Martha Jalnuhubun|63
-KS7A0020002|Alexa Sherryl Jabar|77
-KS7A0020003|Billyand Noah Putra Gaga|52
-KS7A0020004|Apolinaris Kelanit|64
-KS7A0020005|Aprilia Ela Sirwutubun|39
-KS7A0020006|Arlinda Metubun|36
-KS7A0020007|Bois Alfa Ngutra|45
-KS7A0020008|Dewi Putri Madubun|60
-KS7A0020009|Elagren Marlatu Lukas Madubun|20
-KS7A0020010|Fillano Pedrosa Masbaitubun|53
-KS7A0020011|Gracia Viona Yanyaan|33
-KS7A0020012|Johanes Obet Bertkat|56
-KS7A0020013|Jonathan Alvaro Moriolkosu|77
-KS7A0020014|Katarina Rumangun|0
-KS7A0020015|Maria Ayu Paisa|57
-KS7A0020016|Maria Syelena Suripatty Esomar|69
-KS7A0020017|Maria Theresia Rumangun|65
-KS7A0020018|Marlina Ingke Balriyanan|61
-KS7A0020019|Menci Elsina Fantri Karatem|70
-KS7A0020020|Oktovianus Jamrevav|52
-KS7A0020021|Reza Dwi Eirlangga Jamlean|0
-KS7A0020022|Steven Arnold Laumualy|39
-KS7A0020023|Yohana T Resubun|63
-KS7B0020001|Agnes Adriana Tawain.|52
-KS7B0020002|Allmendo Xavi Remetwa.|54
-KS7B0020003|Alexander Simon Vatubun.|36
-KS7B0020004|Aroby Tamher|63
-KS7B0020005|Aprilia Lidwina Welikin|53
-KS7B0020006|Blasius Paskal Dewaut|54
-KS7B0020007|Chaylen Manis Koedoeboen|39
-KS7B0020008|Firman Tanarubun|41
-KS7B0009|Herlina Abarua|48
-KS7B0010|Julius Marzelino Fadirubun|51
-KS7B0011|Jumadi Tamher|43
-KS7B0012|Kanisius Kebubun|0
-KS7B0013|Mintje Glorya Balubun|58
-KS7B0014|Margaretha Futubun|40
-KS7B0015|Mikha Desire Rukait|59
-KS7B0016|Mawar Sharon Kirwelakubun|78
-KS7B0017|Nahla Abidin Rahakratat|47
-KS7B0018|Penina Rumangun|69
-KS7B0019|Rafail Rengur|61
-KS7B0020|Udeta Insoraki Rumyaan|24
-KS7B0021|Yosep L Takerubun|41
-KS7B0022|Maria A. Heatubun|29
-KS8A000001|Alinda Ode|65
-KS8A000002|Andreas Balubun|30
-KS8A000003|Benedicta Petra Akbar|50
-KS8A000004|Carolus B. Varis Wemaf|49
-KS8A000005|Everets Jiffy Gattu|76
-KS8A000006|Gregorius Higuen Balubun|74
-KS8A000007|Johanis Charles Woersok|0
-KS8A000008|Maria Gratia Maturbongs|0
-KS8A000009|Yoseph Erlangga Lamere|83
-KS8A000010|Klementina Fernatyanan|54
-KS8A000011|Mediana Aziera Jeujanan|87
-KS8A000012|Rahmatia Bugis|59
-KS8A000013|Reinal Moriolkosu|79
-KS8A000014|Shalmon Antony Rahangmetan|87
-KS8A000015|Vinsensius Edoardus Balubun|47
-KS8A000016|Welhelmus Zyerzeven Ngarbingan|50
-KS8A000017|Ronal Regen Rahayaan|49
-KS8A000018|Harita F. Laritmas|52
-KS8A000019|Gracia F. Meterai|0
-KS8A000020|Revandi Mukujei|48
-KS8B000001|adriana theresia rahabav|63
-KS8B000002|Christ Noel Desandro Emyu Souhoka|89
-KS8B000003|Dewanti Sari Jamlean|49
-KS8B000004|Fabiano B. S. Janjaan|36
-KS8B000005|Gabriella Ernesta K. Kanarubun|64
-KS8B000006|Gregorius Higuen Balubun|43
-KS8B000007|Johanis Charles Woersok|67
-KS8B000008|Maria Gratia Maturbongs|73
-KS8B000009|Michael Joseph Masbaitubun|76
-KS8B000010|Oksen Petrus Letsoin|70
-KS8B000011|Paulina Chelsie Renwarin|62
-KS8B000012|Restha Jenifer Rahanra|59
-KS8B000013|Wensislaus Eko Wemaf|48
-KS8B000014|FILIO EMANUEL FAR-FAR|71
-KS8B000015|SYANE SELFI RAHANGMETAN|69
-KS8B000016|MARIA STEFANI ATBAR|69
-KS8B000017|Ronal Regen Rahayaan|0
-KS8B000018|Marwan R. Rahayaan|47
-KS9A000001|ADRIANUS RAHANAU|46
-KS9A000002|ADRIEL CALVINO RENWARIN|61
-KS9A000003|AMOS RISAL OILIRA|52
-KS9A000004|DIANA HERMINA HUAWAE|60
-KS9A000005|VIRGYLIUS M.Y. LEFTUNGUN|51
-KS9A000006|GIDION LEFTA|43
-KS9A000007|INTAN RAHAKBAUW|71
-KS9A000008|KEANO MACKENZIE RAHAJAAN|51
-KS9A000009|LEONTINA JEUJANAN|70
-KS9A000010|MARCELINO ALDO RENYAAN|53
-KS9A000011|MARIA MUTIARA WARAT|58
-KS9A000012|MELATI AUREL ROSYADI|53
-KS9A000013|MICHAELA P. D. TAPOTUBUN|73
-KS9A000014|NILAM MARSDA WABULA|52
-KS9A000015|ROBBEN JAKOBUS OHOILEDJAAN|0
-KS9A000016|ROSNATA PUSPITA RENWARIN|20
-KS9A000017|WELHELMUS RUMANGUN|59
-KS9A000018|WIDY CLEANDRA AZAZYA JABAR|74
-KS9A000019|WILIN NOTANUBUN|68
-KS9A000020|LANA RIECEL LABOBAR|55
-KS9B000001|ANDREAS LORENZO TAKERUBUN|61
-KS9B000002|ALFONSINA OHOIULUN|50
-KS9B000003|AZAN AKBAR TUKLOY|0
-KS9B000004|BERNADETA SIAHAYA|56
-KS9B000005|DINDA PELANGI RENHORAN|75
-KS9B000006|INTAN MASAHIDA|74
-KS9B000007|ISRAEL. ABRISYE LABETUBUN|52
-KS9B000008|KRISTINA ANGRENI WELERUBUN|64
-KS9B000009|MARIANUS NGARBINGAN|0
-KS9B000010|MARTHA MELSASAIL|65
-KS9B000011|MUSA EFRUAN|55
-KS9B000012|MARIA BIN METURAN|64
-KS9B000013|NADYA HOEKOEBOEN|69
-KS9B000014|RONI ANGGARA RAWULUNUBUN|0
-KS9B000015|RAHEL M TARANTEIN|62
-KS9B000016|SANDRA JEKLIN FARYO|47
-KS9B000017|YOHANIS MESI EFRUAN|40
-KS9B000018|YOHANIS MARVEL JAMREVAV|43
-KS9B000019|WILHELMUS RAHALOB|0
-KS9B000020|ZULKIFLI RAHAKBAUW|44`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
-
-// IPS (123 siswa)
-const IP=`KS7A0020001|Agustina Martha Jalnuhubun|81
-KS7A0020002|Alexa Sherryl Jabar|81
-KS7A0020003|Billyand Noah Putra Gaga|75
-KS7A0020004|Apolinaris Kelanit|68
-KS7A0020005|Aprilia Ela Sirwutubun|64
-KS7A0020006|Arlinda Metubun|72
-KS7A0020007|Bois Alfa Ngutra|62
-KS7A0020008|Dewi Putri Madubun|82
-KS7A0020009|Elagren Marlatu Lukas Madubun|41
-KS7A0020010|Fillano Pedrosa Masbaitubun|65
-KS7A0020011|Gracia Viona Yanyaan|44
-KS7A0020012|Johanes Obet Bertkat|70
-KS7A0020013|Jonathan Alvaro Moriolkosu|71
-KS7A0020014|Katarina Rumangun|0
-KS7A0020015|Maria Ayu Paisa|67
-KS7A0020016|Maria Syelena Suripatty Esomar|62
-KS7A0020017|Maria Theresia Rumangun|81
-KS7A0020018|Marlina Ingke Balriyanan|65
-KS7A0020019|Menci Elsina Fantri Karatem|71
-KS7A0020020|Oktovianus Jamrevav|41
-KS7A0020021|Reza Dwi Eirlangga Jamlean|0
-KS7A0020022|Steven Arnold Laumualy|65
-KS7A0020023|Yohana T Resubun|86
-KS7B0020001|Agnes Adriana Tawain.|66
-KS7B0020002|Allmendo Xavi Remetwa.|83
-KS7B0020003|Alexander Simon Vatubun.|35
-KS7B0020004|Aroby Tamher|55
-KS7B0020005|Aprilia Lidwina Welikin|76
-KS7B0020006|Blasius Paskal Dewaut|56
-KS7B0020007|Chaylen Manis Koedoeboen|69
-KS7B0020008|Firman Tanarubun|44
-KS7B0009|Herlina Abarua|77
-KS7B0010|Julius Marzelino Fadirubun|70
-KS7B0011|Jumadi Tamher|35
-KS7B0012|Kanisius Kebubun|0
-KS7B0013|Mintje Glorya Balubun|77
-KS7B0014|Margaretha Futubun|33
-KS7B0015|Mikha Desire Rukait|89
-KS7B0016|Mawar Sharon Kirwelakubun|81
-KS7B0017|Nahla Abidin Rahakratat|87
-KS7B0018|Penina Rumangun|71
-KS7B0019|Rafail Rengur|64
-KS7B0020|Udeta Insoraki Rumyaan|58
-KS7B0021|Yosep L Takerubun|60
-KS7B0022|Maria A. Heatubun|49
-KS8A000001|Alinda Ode|89
-KS8A000002|Andreas Balubun|49
-KS8A000003|Benedicta Petra Akbar|83
-KS8A000004|Carolus B. Varis Wemaf|22
-KS8A000005|Everets Jiffy Gattu|62
-KS8A000006|Gregorius Higuen Balubun|63
-KS8A000007|Johanis Charles Woersok|0
-KS8A000008|Maria Gratia Maturbongs|0
-KS8A000009|Yoseph Erlangga Lamere|43
-KS8A000010|Klementina Fernatyanan|56
-KS8A000011|Mediana Aziera Jeujanan|77
-KS8A000012|Rahmatia Bugis|56
-KS8A000013|Reinal Moriolkosu|55
-KS8A000014|Shalmon Antony Rahangmetan|36
-KS8A000015|Vinsensius Edoardus Balubun|58
-KS8A000016|Welhelmus Zyerzeven Ngarbingan|28
-KS8A000017|Ronal Regen Rahayaan|26
-KS8A000018|Harita F. Laritmas|44
-KS8A000019|Gracia F. Meterai|0
-KS8A000020|Revandi Mukujei|20
-KS8B000001|adriana theresia rahabav|58
-KS8B000002|Christ Noel Desandro Emyu Souhoka|84
-KS8B000003|Dewanti Sari Jamlean|63
-KS8B000004|Fabiano B. S. Janjaan|43
-KS8B000005|Gabriella Ernesta K. Kanarubun|53
-KS8B000006|Gregorius Higuen Balubun|60
-KS8B000007|Johanis Charles Woersok|43
-KS8B000008|Maria Gratia Maturbongs|63
-KS8B000009|Michael Joseph Masbaitubun|74
-KS8B000010|Oksen Petrus Letsoin|44
-KS8B000011|Paulina Chelsie Renwarin|51
-KS8B000012|Restha Jenifer Rahanra|43
-KS8B000013|Wensislaus Eko Wemaf|35
-KS8B000014|FILIO EMANUEL FAR-FAR|33
-KS8B000015|SYANE SELFI RAHANGMETAN|54
-KS8B000016|MARIA STEFANI ATBAR|71
-KS8B000017|Ronal Regen Rahayaan|0
-KS8B000018|Marwan R. Rahayaan|18
-KS9A000001|ADRIANUS RAHANAU|59
-KS9A000002|ADRIEL CALVINO RENWARIN|86
-KS9A000003|AMOS RISAL OILIRA|32
-KS9A000004|DIANA HERMINA HUAWAE|94
-KS9A000005|VIRGYLIUS M.Y. LEFTUNGUN|96
-KS9A000006|GIDION LEFTA|55
-KS9A000007|INTAN RAHAKBAUW|100
-KS9A000008|KEANO MACKENZIE RAHAJAAN|96
-KS9A000009|LEONTINA JEUJANAN|98
-KS9A000010|MARCELINO ALDO RENYAAN|85
-KS9A000011|MARIA MUTIARA WARAT|95
-KS9A000012|MELATI AUREL ROSYADI|100
-KS9A000013|MICHAELA P. D. TAPOTUBUN|100
-KS9A000014|NILAM MARSDA WABULA|92
-KS9A000015|ROBBEN JAKOBUS OHOILEDJAAN|0
-KS9A000016|ROSNATA PUSPITA RENWARIN|43
-KS9A000017|WELHELMUS RUMANGUN|95
-KS9A000018|WIDY CLEANDRA AZAZYA JABAR|92
-KS9A000019|WILIN NOTANUBUN|95
-KS9A000020|LANA RIECEL LABOBAR|94
-KS9B000001|ANDREAS LORENZO TAKERUBUN|96
-KS9B000002|ALFONSINA OHOIULUN|59
-KS9B000003|AZAN AKBAR TUKLOY|0
-KS9B000004|BERNADETA SIAHAYA|84
-KS9B000005|DINDA PELANGI RENHORAN|95
-KS9B000006|INTAN MASAHIDA|100
-KS9B000007|ISRAEL. ABRISYE LABETUBUN|46
-KS9B000008|KRISTINA ANGRENI WELERUBUN|98
-KS9B000009|MARIANUS NGARBINGAN|0
-KS9B000010|MARTHA MELSASAIL|74
-KS9B000011|MUSA EFRUAN|98
-KS9B000012|MARIA BIN METURAN|87
-KS9B000013|NADYA HOEKOEBOEN|96
-KS9B000014|RONI ANGGARA RAWULUNUBUN|0
-KS9B000015|RAHEL M TARANTEIN|100
-KS9B000016|SANDRA JEKLIN FARYO|79
-KS9B000017|YOHANIS MESI EFRUAN|48
-KS9B000018|YOHANIS MARVEL JAMREVAV|45
-KS9B000019|WILHELMUS RAHALOB|0
-KS9B000020|ZULKIFLI RAHAKBAUW|55`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
-
-// TIK (123 siswa)
-const TI=`KS7A0020001|Agustina Martha Jalnuhubun|76
-KS7A0020002|Alexa Sherryl Jabar|75
-KS7A0020003|Billyand Noah Putra Gaga|67
-KS7A0020004|Apolinaris Kelanit|71
-KS7A0020005|Aprilia Ela Sirwutubun|47
-KS7A0020006|Arlinda Metubun|61
-KS7A0020007|Bois Alfa Ngutra|66
-KS7A0020008|Dewi Putri Madubun|63
-KS7A0020009|Elagren Marlatu Lukas Madubun|52
-KS7A0020010|Fillano Pedrosa Masbaitubun|75
-KS7A0020011|Gracia Viona Yanyaan|68
-KS7A0020012|Johanes Obet Bertkat|47
-KS7A0020013|Jonathan Alvaro Moriolkosu|63
-KS7A0020014|Katarina Rumangun|0
-KS7A0020015|Maria Ayu Paisa|68
-KS7A0020016|Maria Syelena Suripatty Esomar|72
-KS7A0020017|Maria Theresia Rumangun|66
-KS7A0020018|Marlina Ingke Balriyanan|62
-KS7A0020019|Menci Elsina Fantri Karatem|87
-KS7A0020020|Oktovianus Jamrevav|50
-KS7A0020021|Reza Dwi Eirlangga Jamlean|0
-KS7A0020022|Steven Arnold Laumualy|57
-KS7A0020023|Yohana T Resubun|70
-KS7B0020001|Agnes Adriana Tawain.|69
-KS7B0020002|Allmendo Xavi Remetwa.|53
-KS7B0020003|Alexander Simon Vatubun.|39
-KS7B0020004|Aroby Tamher|44
-KS7B0020005|Aprilia Lidwina Welikin|53
-KS7B0020006|Blasius Paskal Dewaut|46
-KS7B0020007|Chaylen Manis Koedoeboen|48
-KS7B0020008|Firman Tanarubun|42
-KS7B0009|Herlina Abarua|71
-KS7B0010|Julius Marzelino Fadirubun|35
-KS7B0011|Jumadi Tamher|53
-KS7B0012|Kanisius Kebubun|0
-KS7B0013|Mintje Glorya Balubun|52
-KS7B0014|Margaretha Futubun|41
-KS7B0015|Mikha Desire Rukait|56
-KS7B0016|Mawar Sharon Kirwelakubun|62
-KS7B0017|Nahla Abidin Rahakratat|65
-KS7B0018|Penina Rumangun|65
-KS7B0019|Rafail Rengur|69
-KS7B0020|Udeta Insoraki Rumyaan|52
-KS7B0021|Yosep L Takerubun|43
-KS7B0022|Maria A. Heatubun|72
-KS8A000001|Alinda Ode|75
-KS8A000002|Andreas Balubun|76
-KS8A000003|Benedicta Petra Akbar|81
-KS8A000004|Carolus B. Varis Wemaf|46
-KS8A000005|Everets Jiffy Gattu|71
-KS8A000006|Gregorius Higuen Balubun|55
-KS8A000007|Johanis Charles Woersok|0
-KS8A000008|Maria Gratia Maturbongs|0
-KS8A000009|Yoseph Erlangga Lamere|69
-KS8A000010|Klementina Fernatyanan|71
-KS8A000011|Mediana Aziera Jeujanan|61
-KS8A000012|Rahmatia Bugis|50
-KS8A000013|Reinal Moriolkosu|67
-KS8A000014|Shalmon Antony Rahangmetan|68
-KS8A000015|Vinsensius Edoardus Balubun|46
-KS8A000016|Welhelmus Zyerzeven Ngarbingan|52
-KS8A000017|Ronal Regen Rahayaan|50
-KS8A000018|Harita F. Laritmas|66
-KS8A000019|Gracia F. Meterai|0
-KS8A000020|Revandi Mukujei|50
-KS8B000001|adriana theresia rahabav|51
-KS8B000002|Christ Noel Desandro Emyu Souhoka|80
-KS8B000003|Dewanti Sari Jamlean|72
-KS8B000004|Fabiano B. S. Janjaan|45
-KS8B000005|Gabriella Ernesta K. Kanarubun|49
-KS8B000006|Gregorius Higuen Balubun|54
-KS8B000007|Johanis Charles Woersok|47
-KS8B000008|Maria Gratia Maturbongs|66
-KS8B000009|Michael Joseph Masbaitubun|80
-KS8B000010|Oksen Petrus Letsoin|46
-KS8B000011|Paulina Chelsie Renwarin|61
-KS8B000012|Restha Jenifer Rahanra|65
-KS8B000013|Wensislaus Eko Wemaf|0
-KS8B000014|FILIO EMANUEL FAR-FAR|56
-KS8B000015|SYANE SELFI RAHANGMETAN|58
-KS8B000016|MARIA STEFANI ATBAR|56
-KS8B000017|Ronal Regen Rahayaan|0
-KS8B000018|Marwan R. Rahayaan|53
-KS9A000001|ADRIANUS RAHANAU|40
-KS9A000002|ADRIEL CALVINO RENWARIN|58
-KS9A000003|AMOS RISAL OILIRA|57
-KS9A000004|DIANA HERMINA HUAWAE|62
-KS9A000005|VIRGYLIUS M.Y. LEFTUNGUN|42
-KS9A000006|GIDION LEFTA|54
-KS9A000007|INTAN RAHAKBAUW|83
-KS9A000008|KEANO MACKENZIE RAHAJAAN|58
-KS9A000009|LEONTINA JEUJANAN|79
-KS9A000010|MARCELINO ALDO RENYAAN|51
-KS9A000011|MARIA MUTIARA WARAT|71
-KS9A000012|MELATI AUREL ROSYADI|63
-KS9A000013|MICHAELA P. D. TAPOTUBUN|82
-KS9A000014|NILAM MARSDA WABULA|59
-KS9A000015|ROBBEN JAKOBUS OHOILEDJAAN|0
-KS9A000016|ROSNATA PUSPITA RENWARIN|31
-KS9A000017|WELHELMUS RUMANGUN|75
-KS9A000018|WIDY CLEANDRA AZAZYA JABAR|78
-KS9A000019|WILIN NOTANUBUN|65
-KS9A000020|LANA RIECEL LABOBAR|69
-KS9B000001|ANDREAS LORENZO TAKERUBUN|72
-KS9B000002|ALFONSINA OHOIULUN|61
-KS9B000003|AZAN AKBAR TUKLOY|0
-KS9B000004|BERNADETA SIAHAYA|41
-KS9B000005|DINDA PELANGI RENHORAN|70
-KS9B000006|INTAN MASAHIDA|53
-KS9B000007|ISRAEL. ABRISYE LABETUBUN|71
-KS9B000008|KRISTINA ANGRENI WELERUBUN|60
-KS9B000009|MARIANUS NGARBINGAN|0
-KS9B000010|MARTHA MELSASAIL|68
-KS9B000011|MUSA EFRUAN|66
-KS9B000012|MARIA BIN METURAN|67
-KS9B000013|NADYA HOEKOEBOEN|83
-KS9B000014|RONI ANGGARA RAWULUNUBUN|0
-KS9B000015|RAHEL M TARANTEIN|62
-KS9B000016|SANDRA JEKLIN FARYO|66
-KS9B000017|YOHANIS MESI EFRUAN|46
-KS9B000018|YOHANIS MARVEL JAMREVAV|42
-KS9B000019|WILHELMUS RAHALOB|0
-KS9B000020|ZULKIFLI RAHAKBAUW|43`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),parseFloat(p[2])]});
-
-
-// Data Username & Password (123 siswa)
-const UP=`KS7A0020001|Agustina Martha Jalnuhubun|7A020001
-KS7A0020002|Alexa Sherryl Jabar|7A020002
-KS7A0020003|Billyand Noah Putra Gaga|7A020003
-KS7A0020004|Apolinaris Kelanit|7A020004
-KS7A0020005|Aprilia Ela Sirwutubun|7A020005
-KS7A0020006|Arlinda Metubun|7A020006
-KS7A0020007|Bois Alfa Ngutra|7A020007
-KS7A0020008|Dewi Putri Madubun|7A020008
-KS7A0020009|Elagren Marlatu Lukas Madubun|7A020009
-KS7A0020010|Fillano Pedrosa Masbaitubun|7A020010
-KS7A0020011|Gracia Viona Yanyaan|7A020011
-KS7A0020012|Johanes Obet Bertkat|7A020012
-KS7A0020013|Jonathan Alvaro Moriolkosu|7A020013
-KS7A0020014|Katarina Rumangun|7A020014
-KS7A0020015|Maria Ayu Paisa|7A020015
-KS7A0020016|Maria Syelena Suripatty Esomar|7A020016
-KS7A0020017|Maria Theresia Rumangun|7A020017
-KS7A0020018|Marlina Ingke Balriyanan|7A020018
-KS7A0020019|Menci Elsina Fantri Karatem|7A020019
-KS7A00200020|Oktovianus Jamrevav|7A020020
-KS7A00200021|Reza Dwi Eirlangga Jamlean|7A020021
-KS7A00200022|Steven Arnold Laumualy|7A020022
-KS7A00200023|Yohana T Resubun|7A020023
-KS7B0020001|Agnes Adriana Tawain.|7B020001
-KS7B0020002|Allmendo Xavi Remetwa.|7B020002
-KS7B0020003|Alexander Simon Vatubun|7B020003
-KS7B0020004|Aroby Tamher|7B020004
-KS7B0020005|Aprilia Lidwina Welikin|7B020005
-KS7B0020006|Blasius Paskal Dewaut|7B020006
-KS7B0020007|Chaylen Manis Koedoeboen|7B020007
-KS7B0020008|Firman Tanarubun|7B020008
-KS7B0020009|Herlina Abarua|7B020009
-KS7B0020010|Julius Marzelino Fadirubun|7B020010
-KS7B0020011|Jumadi Tamher|7B020011
-KS7B0020012|Kanisius Kebubun|7B020012
-KS7B0020013|Mintje Glorya Balubun|7B020013
-KS7B0020014|Margaretha Futubun|7B020014
-KS7B0020015|Mikha Desire Rukait|7B020015
-KS7B0020016|Mawar Sharon Kirwelakubun|7B020016
-KS7B0020017|Nahla Abidin Rahakratat|7B020017
-KS7B0020018|Penina Rumangun|7B020018
-KS7B0020019|Rafail Rengur|7B020019
-KS7B00200020|Udeta Insoraki Rumyaan|7B020020
-KS7B00200021|Yosep L Takerubun|7B020021
-KS7B00200022|Maria A. Heatubun|7B020022
-KS8A0020001|Alinda Ode|8A020001
-KS8A0020002|Andreas Balubun|8A020002
-KS8A0020003|Benedicta Petra Akbar|8A020003
-KS8A0020004|Carolus B. Varis Wemaf|8A020004
-KS8A0020005|Everets Jiffy Gattu|8A020005
-KS8A0020006|Filipho Aditya Somnaikubun|8A020006
-KS8A0020007|Gabriel Alferdo Ubyaan|8A020007
-KS8A0020008|Giofani Falentino Lutrun|8A020008
-KS8A0020009|Yoseph Erlangga Lamere|8A020009
-KS8A00200010|Klementina Fernatyanan|8A020010
-KS8A00200011|Mediana Aziera Jeujanan|8A020011
-KS8A00200012|Rahmatia Bugis|8A020012
-KS8A00200013|Reinal Moriolkosu|8A020013
-KS8A00200014|Shalmon Antony Rahangmetan|8A020014
-KS8A00200015|Vinsensius Edoardus Balubun|8A020015
-KS8A00200016|Welhelmus Zyerzeven Ngarbingan|8A020016
-KS8A00200017|Marius Rahalus|8A020017
-KS8A00200018|Harita F. Laritmas|8A020018
-KS8A00200019|Gracia F. Meterai|8A020019
-KS8A00200020|Revandi Mukujei|8A020020
-KS8B0020001|adriana theresia rahabav|8B020001
-KS8B0020002|Christ Noel Desandro Emyu Souhoka|8B020002
-KS8B0020003|Dewanti Sari Jamlean|8B020003
-KS8B0020004|Fabiano B. S. Janjaan|8B020004
-KS8B0020005|Gabriella Ernesta K. Kanarubun|8B020005
-KS8B0020006|Gregorius Higuen Balubun|8B020006
-KS8B0020007|Johanis Charles Woersok|8B020007
-KS8B0020008|Maria Gratia Maturbongs|8B020008
-KS8B0020009|Michael Joseph Masbaitubun|8B020009
-KS8B00200010|Oksen Petrus Letsoin|8B020010
-KS8B00200011|Paulina Chelsie Renwarin|8B020011
-KS8B00200012|Restha Jenifer Rahanra|8B020012
-KS8B00200013|Wensislaus Eko Wemaf|8B020013
-KS8B00200014|FILIO EMANUEL FAR-FAR|8B020014
-KS8B00200015|SYANE SELFI RAHANGMETAN|8B020015
-KS8B00200016|MARIA STEFANI ATBAR|8B020016
-KS8B00200017|Ronal Regen Rahayaan|8B020017
-KS8B00200018|Marwan R. Rahayaan|8B020018
-KS9A0020001|ADRIANUS RAHANAU|9A020001
-KS9A0020002|ADRIEL CALVINO RENWARIN|9A020002
-KS9A0020003|AMOS RISAL OILIRA|9A020003
-KS9A0020004|DIANA HERMINA HUAWAE|9A020004
-KS9A0020005|VIRGYLIUS M.Y. LEFTUNGUN|9A020005
-KS9A0020006|GIDION LEFTA|9A020006
-KS9A0020007|INTAN RAHAKBAUW|9A020007
-KS9A0020008|KEANO MACKENZIE RAHAJAAN|9A020008
-KS9A0020009|LEONTINA JEUJANAN|9A020009
-KS9A00200010|MARCELINO ALDO RENYAAN|9A020010
-KS9A00200011|MARIA MUTIARA WARAT|9A020011
-KS9A00200012|MELATI AUREL ROSYADI|9A020012
-KS9A00200013|MICHAELA P. D. TAPOTUBUN|9A020013
-KS9A00200014|NILAM MARSDA WABULA|9A020014
-KS9A00200015|ROBBEN JAKOBUS OHOILEDJAAN|9A020015
-KS9A00200016|ROSNATA PUSPITA RENWARIN|9A020016
-KS9A00200017|WELHELMUS RUMANGUN|9A020017
-KS9A00200018|WIDY CLEANDRA AZAZYA JABAR|9A020018
-KS9A00200019|WILIN NOTANUBUN|9A020019
-KS9A00200020|LANA RIECEL LABOBAR|9A020020
-KS9B0020001|ANDREAS LORENZO TAKERUBUN|9B020001
-KS9B0020002|ALFONSINA OHOIULUN|9B020002
-KS9B0020003|AZAN AKBAR TUKLOY|9B020003
-KS9B0020004|BERNADETA SIAHAYA|9B020004
-KS9B0020005|DINDA PELANGI RENHORAN|9B020005
-KS9B0020006|INTAN MASAHIDA|9B020006
-KS9B0020007|ISRAEL. ABRISYE LABETUBUN|9B020007
-KS9B0020008|KRISTINA ANGRENI WELERUBUN|9B020008
-KS9B0020009|MARIANUS NGARBINGAN|9B020009
-KS9B00200010|MARTHA MELSASAIL|9B020010
-KS9B00200011|MUSA EFRUAN|9B020011
-KS9B00200012|MARIA BIN METURAN|9B020012
-KS9B00200013|NADYA HOEKOEBOEN|9B020013
-KS9B00200014|RONI ANGGARA RAWULUNUBUN|9B020014
-KS9B00200015|RAHEL M TARANTEIN|9B020015
-KS9B00200016|SANDRA JEKLIN FARYO|9B020016
-KS9B00200017|YOHANIS MESI EFRUAN|9B020017
-KS9B00200018|YOHANIS MARVEL JAMREVAV|9B020018
-KS9B00200019|WILHELMUS RAHALOB|9B020019
-KS9B00200020|ZULKIFLI RAHAKBAUW|9B020020`.split('\n').map(r=>{const p=r.split('|');return[p[0].trim(),p[1].trim(),p[2].trim()]});
-
-// Definisi mata pelajaran
-const SUBJECTS=[
-  {id:'bindo',name:'Bahasa Indonesia',col:'Bahasa Indonesia',data:()=>BI},
-  {id:'agkat',name:'Agama Katolik',col:'Agama Katolik',data:()=>AK},
-  {id:'bing',name:'Bahasa Iggris',col:'Bahasa Iggris',data:()=>BG},
-  {id:'pkn',name:'PKn',col:'pkN',data:()=>PK},
-  {id:'ipa',name:'IPA',col:'IPA',data:()=>PA},  
-  {id:'ips',name:'IPS',col:'IPS',data:()=>IP},
-  {id:'agisl',name:'Agama Islam',col:'Agama Islam',data:()=>AI},
-  {id:'mtk',name:'Matematika',col:'Matematika',data:()=>MT},
-  {id:'agprot',name:'Agama Protestan',col:'Agama Protestan',data:()=>AP},
-  {id:'pjok',name:'PJOK',col:'PJOK',data:()=>PJ},
-  {id:'prak',name:'Prakarya',col:'Prakarya',data:()=>M.map(s=>[...s,0])},
-  {id:'tik',name:'TIK',col:'TIK',data:()=>TI}
-];
-
-const LOGO_URL='https://lh3.googleusercontent.com/d/18-fVQ1HqVhduTzsYSxFj6PqJop4ifDru';
-const JADWAL_URL='https://lh3.googleusercontent.com/d/1NYW3oN1jG8LXE4G2J0Ks3EKUJoAKpNon';
-const DEFAULT_PENGUMUMAN='Jangan lupa subscribe YouTube Channel SMP Karel Sadsuitubun. Ujian OSN akan disiarkan secara live melalui YouTube. Saksikan dan dukung bersama. Jadwal Ujian OSN akan disampaikan kemudian. Terima kasih.';
-
-/* ===================== STATE ===================== */
-let role=''; // 'admin' atau 'umum'
-let curPage='dashboard';
-let curSubject='';
-
-/* ===================== UTILITAS ===================== */
-function $(id){return document.getElementById(id)}
-function toast(msg,type='info'){
-  const c=$('toastContainer');
-  const t=document.createElement('div');
-  t.className='toast '+type;
-  t.innerHTML='<i class="fas fa-'+(type==='success'?'check-circle':type==='error'?'times-circle':'info-circle')+'"></i> '+msg;
-  c.appendChild(t);
-  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(40px)';t.style.transition='.3s';setTimeout(()=>t.remove(),300)},3000);
-}
-function scoreClass(v){
-  if(v>=80)return 'score-high';
-  if(v>=60)return 'score-mid';
-  return 'score-low';
-}
-function getPengumuman(){return localStorage.getItem('sts_pengumuman')||DEFAULT_PENGUMUMAN}
-function setPengumuman(t){localStorage.setItem('sts_pengumuman',t)}
-function getAccessCount(){return parseInt(localStorage.getItem('sts_access_count')||'0')}
-function incAccessCount(){localStorage.setItem('sts_access_count',''+(getAccessCount()+1))}
-
-/* ===================== AUTH ===================== */
-function doLogin(){
-  const u=$('loginUser').value.trim();
-  const p=$('loginPass').value.trim();
-  const err=$('loginError');
-  if(u==='admin'&&p==='admin'){role='admin';err.style.display='none';showApp()}
-  else if(u==='ptsks'&&p==='ptsks'){role='umum';err.style.display='none';showApp()}
-  else{err.textContent='Username atau password salah!';err.style.display='block'}
-}
-function doLogout(){
-  role='';curPage='dashboard';curSubject='';
-  $('mainApp').style.display='none';
-  $('loginPage').style.display='flex';
-  $('loginUser').value='';$('loginPass').value='';
-}
-// Enter pada input login
- $('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
- $('loginUser').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginPass').focus()});
-
-function showApp(){
-  incAccessCount();
-  $('loginPage').style.display='none';
-  $('mainApp').style.display='block';
-  $('userBadge').textContent=role==='admin'?'Administrator':'Umum';
-  buildSidebar();
-  navigateTo('dashboard');
-}
-
-/* ===================== SIDEBAR ===================== */
-function buildSidebar(){
-  const nav=$('sidebarNav');
-  let html=`<div class="nav-item${curPage==='dashboard'?' active':''}" onclick="navigateTo('dashboard')"><i class="fas fa-home"></i> Dashboard</div>`;
-  // Hasil STS
-  html+=`<div class="nav-sub-toggle${curPage==='sts'?' active':''}${curPage==='sts'?' open':''}" onclick="toggleSTSMenu(this)"><i class="fas fa-chart-bar"></i> Hasil STS<i class="fas fa-chevron-right chevron"></i></div>`;
-  html+=`<div class="nav-sub${curPage==='sts'?' open':''}">`;
-  SUBJECTS.forEach(s=>{
-    html+=`<div class="nav-item${curSubject===s.id?' active':''}" onclick="selectSubject('${s.id}')">${s.name}</div>`;
-  });
-  html+=`</div>`;
-  // User Password
-  html+=`<div class="nav-item${curPage==='userpass'?' active':''}" onclick="navigateTo('userpass')"><i class="fas fa-key"></i> User Password</div>`;
-  // Pengaturan (hanya admin)
-  if(role==='admin'){
-    html+=`<div class="nav-item${curPage==='settings'?' active':''}" onclick="navigateTo('settings')"><i class="fas fa-cog"></i> Pengaturan</div>`;
-  }
-  nav.innerHTML=html;
-}
-function toggleSTSMenu(el){
-  el.classList.toggle('open');
-  const sub=el.nextElementSibling;
-  sub.classList.toggle('open');
-}
-function toggleSidebar(){
-  $('sidebar').classList.toggle('open');
-  $('sidebarOverlay').classList.toggle('open');
-}
-
-/* ===================== NAVIGASI ===================== */
-function navigateTo(page){
-  curPage=page;curSubject='';
-  buildSidebar();
-  $('topbarTitle').textContent=page==='dashboard'?'Dashboard':page==='userpass'?'User Password':page==='settings'?'Pengaturan':'Hasil STS';
-  // Tutup sidebar mobile
-  $('sidebar').classList.remove('open');
-  $('sidebarOverlay').classList.remove('open');
-  const c=$('contentArea');
-  if(page==='dashboard')renderDashboard(c);
-  else if(page==='userpass')renderUserPass(c);
-  else if(page==='settings')renderSettings(c);
-  else if(page==='sts'){renderSTSPlaceholder(c)}
-}
-function selectSubject(id){
-  curPage='sts';curSubject=id;
-  buildSidebar();
-  const s=SUBJECTS.find(x=>x.id===id);
-  $('topbarTitle').textContent='Hasil STS - '+s.name;
-  $('sidebar').classList.remove('open');
-  $('sidebarOverlay').classList.remove('open');
-  renderSTS($('contentArea'),s);
-}
-function renderSTSPlaceholder(c){
-  c.innerHTML=`<div class="page active"><div class="card" style="text-align:center;padding:60px 20px"><i class="fas fa-hand-pointer" style="font-size:2.5rem;color:var(--primary-l);margin-bottom:14px;display:block"></i><h3 style="margin-bottom:8px">Pilih Mata Pelajaran</h3><p style="color:var(--muted);font-size:.85rem">Klik salah satu mata pelajaran di menu sidebar untuk melihat hasil STS.</p></div></div>`;
-}
-
-/* ===================== DASHBOARD ===================== */
-function renderDashboard(c){
-  const totalPD=M.length;
-  const totalUP=UP.length;
-  const akses=getAccessCount();
-  let cards=`
-  <div class="stat-grid">
-    <div class="stat-card">
-      <div class="stat-icon blue"><i class="fas fa-users"></i></div>
-      <div class="stat-info"><div class="stat-label">Total Peserta Didik</div><div class="stat-value">${totalPD}</div></div>
-      <img class="stat-logo" src="${LOGO_URL}" alt="Logo" onerror="this.style.display='none'">
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon teal"><i class="fas fa-key"></i></div>
-      <div class="stat-info"><div class="stat-label">Jumlah Username & Password</div><div class="stat-value">${totalUP}</div></div>
-    </div>`;
-  if(role==='admin'){
-    cards+=`
-    <div class="stat-card">
-      <div class="stat-icon green"><i class="fas fa-sign-in-alt"></i></div>
-      <div class="stat-info"><div class="stat-label">Total Akses Aplikasi</div><div class="stat-value">${akses}</div></div>
-    </div>`;
-  }
-  cards+=`</div>`;
-  // Pengumuman
-  const pgm=getPengumuman();
-  cards+=`
-  <div class="pengumuman-box">
-    <h4><i class="fas fa-bullhorn"></i> Pengumuman</h4>
-    <p>${pgm.replace(/\n/g,'<br>')}</p>
-    <img class="jadwal-img" src="${JADWAL_URL}" alt="Jadwal OSN" onerror="this.style.display='none'">
-  </div>`;
-  c.innerHTML=`<div class="page active">${cards}</div>`;
-}
-
-/* ===================== HASIL STS ===================== */
-function renderSTS(c,subj){
-  const data=subj.data();
-  let html=`<div class="page active"><div class="card">`;
-  html+=`<div class="card-title"><i class="fas fa-table"></i> Hasil STS - ${subj.name}</div>`;
-  // Download hanya admin
-  if(role==='admin'){
-    html+=`<div style="margin-bottom:12px"><button class="btn btn-success btn-sm" onclick="downloadSTS('${subj.id}')"><i class="fas fa-download"></i> Download</button></div>`;
-  }
-  // Pencarian
-  html+=`<div class="search-wrap" style="margin-bottom:12px"><i class="fas fa-search"></i><input type="text" placeholder="Cari berdasarkan nama..." oninput="filterSTS(this.value,'${subj.id}')"></div>`;
-  html+=`<div class="table-wrap"><table><thead><tr><th>No</th><th>Username</th><th>Nama</th><th>${subj.col}</th></tr></thead><tbody id="stsBody_${subj.id}">`;
-  data.forEach((d,i)=>{
-    const sc=d[2];
-    html+=`<tr><td>${i+1}</td><td>${d[0]}</td><td>${d[1]}</td><td class="${scoreClass(sc)}">${sc}</td></tr>`;
-  });
-  html+=`</tbody></table></div></div></div>`;
-  c.innerHTML=html;
-}
-function filterSTS(q,sid){
-  const subj=SUBJECTS.find(s=>s.id===sid);
-  const data=subj.data();
-  const ql=q.toLowerCase().trim();
-  const tb=$('stsBody_'+sid);
-  let html='';
-  let no=0;
-  data.forEach(d=>{
-    if(!ql||d[1].toLowerCase().includes(ql)){
-      no++;
-      html+=`<tr><td>${no}</td><td>${d[0]}</td><td>${d[1]}</td><td class="${scoreClass(d[2])}">${d[2]}</td></tr>`;
+        dbAbsenSiswa = JSON.parse(localStorage.getItem('dbAbsenSiswa')) || [];
+        dbAbsenGuru = JSON.parse(localStorage.getItem('dbAbsenGuru')) || [];
+        dbGuru = JSON.parse(localStorage.getItem('dbGuru')) || [];
+        dbNilaiHTS = JSON.parse(localStorage.getItem('dbNilaiHTS')) || {};
+        dbNilaiHS = JSON.parse(localStorage.getItem('dbNilaiHS')) || {};
+        appSettings = JSON.parse(localStorage.getItem('appSettings')) || appSettings;
+        
+        saveDB();
+        buildMenuMapel();
     }
-  });
-  if(!html)html=`<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">Tidak ditemukan</td></tr>`;
-  tb.innerHTML=html;
-}
-function downloadSTS(sid){
-  const subj=SUBJECTS.find(s=>s.id===sid);
-  const data=subj.data();
-  let csv='No,Username,Nama,'+subj.col+'\n';
-  data.forEach((d,i)=>{csv+=(i+1)+',"'+d[0]+'","'+d[1]+'",'+d[2]+'\n'});
-  downloadFile(csv,'STS_'+subj.name.replace(/ /g,'_')+'.csv','text/csv');
-  toast('Data berhasil didownload','success');
-}
 
-/* ===================== USER PASSWORD ===================== */
-function renderUserPass(c){
-  let html=`<div class="page active"><div class="card">`;
-  html+=`<div class="card-title"><i class="fas fa-key"></i> Data Username & Password</div>`;
-  // Tombol admin saja
-  if(role==='admin'){
-    html+=`<div class="btn-group" style="margin-bottom:12px">
-      <button class="btn btn-success btn-sm" onclick="downloadUserPass()"><i class="fas fa-download"></i> Download</button>
-      <button class="btn btn-outline btn-sm" onclick="$('importUP').click()"><i class="fas fa-file-import"></i> Import</button>
-      <button class="btn btn-primary btn-sm" onclick="$('uploadUP').click()"><i class="fas fa-upload"></i> Upload</button>
-      <input type="file" id="importUP" accept=".csv" style="display:none" onchange="importUserPass(this,true)">
-      <input type="file" id="uploadUP" accept=".csv" style="display:none" onchange="importUserPass(this,false)">
-    </div>`;
-  }
-  // Pencarian
-  html+=`<div class="search-wrap" style="margin-bottom:12px"><i class="fas fa-search"></i><input type="text" placeholder="Cari berdasarkan nama..." oninput="filterUP(this.value)"></div>`;
-  html+=`<div class="table-wrap"><table><thead><tr><th>No</th><th>Username</th><th>Nama</th><th>Password</th></tr></thead><tbody id="upBody">`;
-  UP.forEach((d,i)=>{
-    html+=`<tr><td>${i+1}</td><td>${d[0]}</td><td>${d[1]}</td><td><code style="background:#e3f2fd;padding:2px 8px;border-radius:4px;font-size:.8rem">${d[2]}</code></td></tr>`;
-  });
-  html+=`</tbody></table></div></div></div>`;
-  c.innerHTML=html;
-}
-function filterUP(q){
-  const ql=q.toLowerCase().trim();
-  const tb=$('upBody');
-  let html='';let no=0;
-  UP.forEach(d=>{
-    if(!ql||d[1].toLowerCase().includes(ql)){
-      no++;
-      html+=`<tr><td>${no}</td><td>${d[0]}</td><td>${d[1]}</td><td><code style="background:#e3f2fd;padding:2px 8px;border-radius:4px;font-size:.8rem">${d[2]}</code></td></tr>`;
+    function saveDB() {
+        localStorage.setItem('dbSiswa', JSON.stringify(dbSiswa));
+        localStorage.setItem('dbUSPW', JSON.stringify(dbUSPW));
+        localStorage.setItem('dbAbsenSiswa', JSON.stringify(dbAbsenSiswa));
+        localStorage.setItem('dbAbsenGuru', JSON.stringify(dbAbsenGuru));
+        localStorage.setItem('dbGuru', JSON.stringify(dbGuru));
+        localStorage.setItem('dbNilaiHTS', JSON.stringify(dbNilaiHTS));
+        localStorage.setItem('dbNilaiHS', JSON.stringify(dbNilaiHS));
+        localStorage.setItem('appSettings', JSON.stringify(appSettings));
     }
-  });
-  if(!html)html=`<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">Tidak ditemukan</td></tr>`;
-  tb.innerHTML=html;
-}
-function downloadUserPass(){
-  let csv='No,Username,Nama,Password\n';
-  UP.forEach((d,i)=>{csv+=(i+1)+',"'+d[0]+'","'+d[1]+'","'+d[2]+'"\n'});
-  downloadFile(csv,'Username_Password.csv','text/csv');
-  toast('Data berhasil didownload','success');
-}
-function importUserPass(input,replace){
-  const file=input.files[0];
-  if(!file)return;
-  const reader=new FileReader();
-  reader.onload=function(e){
-    try{
-      const lines=e.target.result.split('\n').filter(l=>l.trim());
-      if(lines.length<2){toast('File kosong atau tidak valid','error');return}
-      let imported=0;
-      for(let i=1;i<lines.length;i++){
-        const cols=lines[i].match(/(".*?"|[^,]+)/g);
-        if(cols&&cols.length>=4){
-          const u=cols[1].replace(/"/g,'').trim();
-          const n=cols[2].replace(/"/g,'').trim();
-          const p=cols[3].replace(/"/g,'').trim();
-          if(u&&n&&p){
-            if(replace){
-              // Replace: hanya tambahkan jika belum ada
-              const idx=UP.findIndex(x=>x[0]===u);
-              if(idx===-1)UP.push([u,n,p]);
-              else{UP[idx][1]=n;UP[idx][2]=p}
-            }else{
-              UP.push([u,n,p]);
-            }
-            imported++;
-          }
+
+    // ===================== AUTH & UI =====================
+    function login() {
+        const u = document.getElementById('username').value;
+        const p = document.getElementById('password').value;
+        if(u === 'admin' && p === 'admin') currentUser = {role: 'admin', name: 'Administrator'};
+        else if(u === 'ptsks' && p === 'ptsks') currentUser = {role: 'umum', name: 'Umum'};
+        else if(u === 'guru' && p === 'guru') currentUser = {role: 'guru', name: 'Guru'};
+        
+        if(currentUser) {
+            document.getElementById('login-view').style.display = 'none';
+            document.getElementById('app-view').style.display = 'flex';
+            document.getElementById('sidebar-role').innerText = currentUser.name;
+            document.getElementById('user-display').innerText = currentUser.name;
+            applyRole();
+            showPage('dashboard');
+        } else {
+            document.getElementById('login-error').style.display = 'block';
         }
-      }
-      toast('Berhasil import '+imported+' data','success');
-      renderUserPass($('contentArea'));
-    }catch(err){toast('Gagal membaca file: '+err.message,'error')}
-  };
-  reader.readAsText(file);
-  input.value='';
-}
+    }
 
-/* ===================== PENGATURAN ===================== */
-function renderSettings(c){
-  const pgm=getPengumuman();
-  let html=`<div class="page active">`;
-  // Logo
-  html+=`<div class="card">
-    <div class="card-title"><i class="fas fa-image"></i> Logo Sekolah</div>
-    <img class="settings-logo" src="${LOGO_URL}" alt="Logo Sekolah" onerror="this.alt='Logo tidak tersedia'">
-  </div>`;
-  // Download & Import seluruh data
-  html+=`<div class="card">
-    <div class="card-title"><i class="fas fa-database"></i> Kelola Data</div>
-    <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px">Download seluruh data aplikasi sebagai file backup, atau import data yang sebelumnya sudah dibuat.</p>
-    <div class="btn-group">
-      <button class="btn btn-success" onclick="downloadAllData()"><i class="fas fa-download"></i> Download Semua Data</button>
-      <button class="btn btn-primary" onclick="$('importAll').click()"><i class="fas fa-file-import"></i> Import Data</button>
-      <input type="file" id="importAll" accept=".json" style="display:none" onchange="importAllData(this)">
-    </div>
-  </div>`;
-  // Pengumuman
-  html+=`<div class="card">
-    <div class="card-title"><i class="fas fa-bullhorn"></i> Pengaturan Pengumuman</div>
-    <div class="settings-section">
-      <label>Teks Pengumuman (ditampilkan di Dashboard)</label>
-      <textarea id="pengumumanInput">${pgm}</textarea>
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="savePengumuman()"><i class="fas fa-save"></i> Simpan Pengumuman</button>
-      </div>
-    </div>
-  </div>`;
-  // Jadwal
-  html+=`<div class="card">
-    <div class="card-title"><i class="fas fa-calendar-alt"></i> Jadwal Ujian OSN</div>
-    <img style="max-width:100%;border-radius:8px" src="${JADWAL_URL}" alt="Jadwal OSN" onerror="this.alt='Jadwal tidak tersedia';this.style.padding='20px';this.style.background='#f5f8ff'">
-  </div>`;
-  html+=`</div>`;
-  c.innerHTML=html;
-}
-function savePengumuman(){
-  const v=$('pengumumanInput').value.trim();
-  if(!v){toast('Pengumuman tidak boleh kosong','error');return}
-  setPengumuman(v);
-  toast('Pengumuman berhasil disimpan','success');
-}
-function downloadAllData(){
-  const allData={
-    bindo:BI, agkat:AK, bing:BG, PKn:PK, IPA:PA, agisl:AI, aprot:Ap, mtk:MT, pjok:PJ, ips:IP, tik:TI, userpass:UP,
-    pengumuman:getPengumuman(),
-    accessCount:getAccessCount(),
-    exportedAt:new Date().toISOString()
-  };
-  const json=JSON.stringify(allData,null,2);
-  downloadFile(json,'Data_STS_SMP_Karel.json','application/json');
-  toast('Semua data berhasil didownload','success');
-}
-function importAllData(input){
-  const file=input.files[0];
-  if(!file)return;
-  const reader=new FileReader();
-  reader.onload=function(e){
-    try{
-      const data=JSON.parse(e.target.result);
-      let count=0;
-      if(data.bindo&&Array.isArray(data.bindo)){BI.length=0;data.bindo.forEach(d=>BI.push(d));count++}
-      if(data.agkat&&Array.isArray(data.agkat)){AK.length=0;data.agkat.forEach(d=>AK.push(d));count++}
-      if(data.agkat&&Array.isArray(data.bing)){BG.length=0;data.agkat.forEach(d=>BG.push(d));count++}
-      if(data.agkat&&Array.isArray(data.agkat)){PK.length=0;data.agkat.forEach(d=>PK.push(d));count++}
-      if(data.agkat&&Array.isArray(data.agkat)){PA.length=0;data.agkat.forEach(d=>PA.push(d));count++}
-      if(data.agkat&&Array.isArray(data.agkat)){AI.length=0;data.agkat.forEach(d=>AI.push(d));count++} 
-      if(data.agkat&&Array.isArray(data.agkat)){MT.length=0;data.agkat.forEach(d=>MT.push(d));count++} 
-      if(data.agkat&&Array.isArray(data.agkat)){AP.length=0;data.agkat.forEach(d=>AP.push(d));count++}  
-      if(data.agkat&&Array.isArray(data.agkat)){PJ.length=0;data.agkat.forEach(d=>AP.push(d));count++}
-      if(data.agkat&&Array.isArray(data.agkat)){IP.length=0;data.agkat.forEach(d=>AP.push(d));count++}
-      if(data.agkat&&Array.isArray(data.agkat)){TI.length=0;data.agkat.forEach(d=>AP.push(d));count++}
+    function logout() {
+        currentUser = null;
+        document.getElementById('app-view').style.display = 'none';
+        document.getElementById('login-view').style.display = 'flex';
+    }
 
-      if(data.userpass&&Array.isArray(data.userpass)){UP.length=0;data.userpass.forEach(d=>UP.push(d));count++}
-      if(data.pengumuman)setPengumuman(data.pengumuman);
-      if(data.accessCount!==undefined)localStorage.setItem('sts_access_count',''+data.accessCount);
-      toast('Berhasil import '+count+' kategori data','success');
-    }catch(err){toast('Gagal membaca file: '+err.message,'error')}
-  };
-  reader.readAsText(file);
-  input.value='';
-}
+    function applyRole() {
+        if(currentUser.role === 'umum' || currentUser.role === 'guru') {
+            document.getElementById('m-pengaturan').style.display = 'none';
+        }
+        if(currentUser.role === 'umum') {
+            document.getElementById('btn-dl-siswa').style.display = 'none';
+            document.getElementById('m-wajah-guru').style.display = 'none';
+            document.getElementById('m-absen-guru').style.display = 'none';
+            document.getElementById('m-riwayat-guru').style.display = 'none';
+        }
+    }
 
-/* ===================== DOWNLOAD HELPER ===================== */
-function downloadFile(content,filename,type){
-  const blob=new Blob([content],{type:type+';charset=utf-8'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;a.download=filename;
-  document.body.appendChild(a);a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
+    function toggleSidebar() {
+        let sb = document.getElementById('sidebar');
+        let mc = document.getElementById('main-content');
+        sb.classList.toggle('hide');
+        sb.classList.toggle('show');
+        mc.classList.toggle('full');
+    }
+
+    function toggleSub(el) { el.nextElementSibling.classList.toggle('show'); }
+
+    function showPage(pageId, mapel=null, type=null) {
+        document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+        document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+        
+        if(mapel) {
+            document.getElementById('page-nilai').style.display = 'block';
+            document.getElementById('page-title').innerText = (type==='HTS'?'HTS ':'HS ') + mapel;
+            renderNilai(type, mapel);
+        } else {
+            document.getElementById('page-'+pageId).style.display = 'block';
+            document.getElementById('page-title').innerText = pageId.replace(/-/g, ' ').toUpperCase();
+        }
+
+        if(pageId === 'dashboard') renderDash();
+        if(pageId === 'data-siswa') renderSiswa();
+        if(pageId === 'us-pw') renderUSPW();
+        if(pageId === 'qr-siswa') renderQR();
+        if(pageId === 'wajah-guru') renderWajahGuru();
+        if(pageId === 'hasil-siswa') renderHasilSiswa();
+        if(pageId === 'hasil-guru') renderHasilGuru();
+        if(pageId === 'pengaturan') renderPengaturan();
+
+        if(window.innerWidth <= 768) {
+            document.getElementById('sidebar').classList.remove('show');
+            document.getElementById('main-content').classList.add('full');
+        }
+    }
+
+    function buildMenuMapel() {
+        const hts = document.getElementById('menu-hts');
+        const hs = document.getElementById('menu-hs');
+        mapelList.forEach(m => {
+            hts.innerHTML += `<div class="menu-item" onclick="showPage('nilai', '${m}', 'HTS')"><i class="fas fa-book"></i> ${m}</div>`;
+            hs.innerHTML += `<div class="menu-item" onclick="showPage('nilai', '${m}', 'HS')"><i class="fas fa-book"></i> ${m}</div>`;
+        });
+    }
+
+    // ===================== RENDER FUNCTIONS =====================
+    function renderDash() {
+        document.getElementById('dash-total-pd').innerText = dbSiswa.length;
+        document.getElementById('dash-total-uspw').innerText = dbUSPW.length;
+        document.getElementById('dash-pengumuman').innerText = appSettings.pengumuman;
+    }
+
+    function renderSiswa() {
+        const src = document.getElementById('src-siswa').value.toLowerCase();
+        const kls = document.getElementById('filter-kelas').value;
+        const tbody = document.querySelector('#tbl-siswa tbody');
+        tbody.innerHTML = '';
+        let no = 1;
+        dbSiswa.forEach(s => {
+            if((s.nama.toLowerCase().includes(src) || s.nisn.includes(src)) && (kls === "" || s.kelas === kls)) {
+                tbody.innerHTML += `<tr><td>${no++}</td><td>${s.nama}</td><td>${s.nisn}</td><td>${s.agama}</td><td>${s.tmpt}</td><td>${s.tgl}</td><td>${s.kelas}</td></tr>`;
+            }
+        });
+    }
+
+    function renderUSPW() {
+        const src = document.getElementById('src-uspw').value.toLowerCase();
+        const c = document.getElementById('uspw-container');
+        c.innerHTML = '';
+        dbUSPW.forEach(u => {
+            if(u.nama.toLowerCase().includes(src) || u.no_uspw.toLowerCase().includes(src)) {
+                c.innerHTML += `<div class="uspw-card"><h4>${u.no_uspw}</h4><p style="font-size:12px; margin:5px 0;">${u.nama}</p><small style="color:#666;">${u.kode}</small></div>`;
+            }
+        });
+    }
+
+    function renderQR() {
+        const kls = document.getElementById('qr-kelas').value;
+        const c = document.getElementById('qr-container');
+        c.innerHTML = '';
+        if(!kls) return;
+        dbSiswa.filter(s => s.kelas === kls).forEach(s => {
+            const div = document.createElement('div');
+            div.className = "uspw-card";
+            div.id = 'qr-'+s.nisn;
+            div.innerHTML = `<p style="font-size:11px; font-weight:bold;">${s.nama}</p>`;
+            c.appendChild(div);
+            new QRCode(div, { text: s.nisn, width: 100, height: 100 });
+        });
+    }
+
+    function dlQR(type) {
+        const kls = document.getElementById('qr-kelas').value;
+        if(!kls) return alert('Pilih kelas dahulu!');
+        const content = document.getElementById('qr-container').innerHTML;
+        if(type === 'pdf') {
+            const w = window.open('', '', 'height=600,width=800');
+            w.document.write('<html><head><title>QR Code</title></head><body>');
+            w.document.write('<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;text-align:center;">');
+            w.document.write(content);
+            w.document.write('</div></body></html>');
+            w.document.close(); w.print();
+        } else {
+            const preHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'></head><body><div style="display:flex; flex-wrap:wrap; gap:10px;">`;
+            const postHtml = `</div></body></html>`;
+            const blob = new Blob(['\ufeff', preHtml + content + postHtml], {type: 'application/msword'});
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `QR_Siswa_${kls}.doc`; a.click();
+        }
+    }
+
+    function startCam(id) {
+        navigator.mediaDevices.getUserMedia({video: true}).then(stream => {
+            document.getElementById(id).srcObject = stream;
+        }).catch(err => alert("Kamera Gagal: " + err));
+    }
+
+    let html5QrCode;
+    function openScanner() {
+        document.getElementById('scanner-modal').style.display = 'flex';
+        html5QrCode = new Html5Qrcode("qr-reader");
+        html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, onScanSuccess).catch(err => alert("Gagal buka kamera scan"));
+    }
+    function closeScanner() {
+        if(html5QrCode) html5QrCode.stop().then(() => { html5QrCode.clear(); document.getElementById('scanner-modal').style.display = 'none'; });
+    }
+    function onScanSuccess(decodedText) {
+        closeScanner();
+        const siswa = dbSiswa.find(s => s.nisn === decodedText);
+        if(siswa) {
+            const mapel = prompt(`Siswa ${siswa.nama} ditemukan!\nMasuk Mapel apa?`, "PJOK");
+            if(mapel) {
+                dbAbsenSiswa.push({ nama: siswa.nama, kelas: siswa.kelas, mapel: mapel, tanggal: new Date().toISOString().split('T')[0], jam: new Date().toTimeString().split(' ')[0], status: 'Hadir' });
+                saveDB(); alert('Absen Berhasil!');
+            }
+        } else alert('NISN tidak ditemukan!');
+    }
+
+    function simpanWajahGuru() {
+        const n = document.getElementById('guru-nama').value;
+        const j = document.getElementById('guru-jabatan').value;
+        if(!n || !j) return alert('Isi data guru!');
+        dbGuru.push({nama: n, jabatan: j, id: 'guru_'+Date.now()});
+        saveDB(); renderWajahGuru(); alert('Wajah Guru Disimpan (Simulasi)');
+    }
+    function renderWajahGuru() {
+        const l = document.getElementById('list-guru'); l.innerHTML = '';
+        dbGuru.forEach(g => l.innerHTML += `<li>${g.nama} - ${g.jabatan}</li>`);
+    }
+
+    function simulasiAbsenSiswa() {
+        const mapel = document.getElementById('absen-mapel').value;
+        const namaSiswa = prompt("Simulasi Absen Siswa\nMasukkan Nama Siswa:", dbSiswa[0].nama);
+        const siswa = dbSiswa.find(s => s.nama.toLowerCase() === namaSiswa.toLowerCase());
+        if(siswa) {
+            dbAbsenSiswa.push({ nama: siswa.nama, kelas: siswa.kelas, mapel: mapel, tanggal: new Date().toISOString().split('T')[0], jam: new Date().toTimeString().split(' ')[0], status: 'Hadir' });
+            saveDB(); alert('Absensi Siswa Berhasil!');
+        } else alert("Siswa tidak ditemukan!");
+    }
+
+    function simulasiAbsenGuru(type) {
+        const guru = dbGuru[0] || {nama: "Guru Demo", jabatan: "Guru"};
+        dbAbsenGuru.push({ nama: guru.nama, jabatan: guru.jabatan, tanggal: new Date().toISOString().split('T')[0], jam: new Date().toTimeString().split(' ')[0], status: type });
+        saveDB(); alert(`Absen ${type} Guru Berhasil!`);
+    }
+
+    function renderHasilSiswa() {
+        const src = document.getElementById('src-hasil-siswa').value.toLowerCase();
+        const mapelF = document.getElementById('filter-mapel-hasil').value;
+        const tglF = document.getElementById('filter-tgl-hasil').value;
+        
+        const sel = document.getElementById('filter-mapel-hasil');
+        sel.innerHTML = '<option value="">Semua Mapel</option>';
+        mapelList.forEach(m => sel.innerHTML += `<option value="${m}">${m}</option>`);
+        sel.value = mapelF;
+
+        const tbody = document.querySelector('#tbl-hasil-siswa tbody'); tbody.innerHTML = '';
+        dbAbsenSiswa.filter(a => {
+            return (a.nama.toLowerCase().includes(src)) && (!mapelF || a.mapel === mapelF) && (!tglF || a.tanggal === tglF);
+        }).forEach(a => {
+            tbody.innerHTML += `<tr><td>${a.nama}</td><td>${a.kelas}</td><td>${a.mapel}</td><td>${a.tanggal}</td><td>${a.jam}</td><td>${a.status}</td></tr>`;
+        });
+    }
+
+    function renderHasilGuru() {
+        const tbody = document.querySelector('#tbl-hasil-guru tbody'); tbody.innerHTML = '';
+        dbAbsenGuru.forEach(a => {
+            tbody.innerHTML += `<tr><td><i class="fas fa-user-circle" style="font-size:24px; color:var(--primary);"></i></td><td>${a.nama}</td><td>${a.jabatan}</td><td>${a.tanggal}</td><td>${a.jam}</td><td>${a.status}</td></tr>`;
+        });
+    }
+
+    function renderNilai(type, mapel) {
+        const isHTS = type === 'HTS';
+        let dbNilai = isHTS ? dbNilaiHTS : dbNilaiHS;
+        const c = document.getElementById('nilai-content');
+        const isDisabled = currentUser.role === 'umum' ? 'disabled' : '';
+
+        let siswaFiltered = dbSiswa;
+        if(mapel === 'Agama Katolik') siswaFiltered = dbSiswa.filter(s => s.agama.toLowerCase() === 'katholik');
+        else if(mapel === 'Agama Kristen') siswaFiltered = dbSiswa.filter(s => s.agama.toLowerCase() === 'kristen');
+        else if(mapel === 'Agama Islam') siswaFiltered = dbSiswa.filter(s => s.agama.toLowerCase() === 'islam');
+
+        let html = `<h3><i class="fas fa-book"></i> ${type} - ${mapel}</h3><p style="margin-bottom:10px; font-weight:bold;">User: ${currentUser.name}</p>
+        <div style="overflow-x:auto;"><table id="tbl-nilai-dynamic">
+        <thead><tr><th>No</th><th>Nama</th><th>Kelas</th><th>Nilai</th></tr></thead><tbody>`;
+
+        siswaFiltered.forEach((s, i) => {
+            const val = dbNilai[s.nisn] ? (dbNilai[s.nisn][mapel] || '-') : '-';
+            html += `<tr>
+                <td>${i+1}</td>
+                <td>${s.nama}</td>
+                <td>${s.kelas}</td>
+                <td><input type="number" min="0" max="100" value="${val === '-' ? '' : val}" 
+                    onchange="saveNilai('${type}','${s.nisn}','${mapel}', this.value)" ${isDisabled} style="width:70px; padding:5px; text-align:center;"></td>
+            </tr>`;
+        });
+
+        html += `</tbody></table></div>`;
+        if(currentUser.role === 'admin') {
+            html += `<button onclick="autoNilai('${type}','${mapel}')" class="btn-warning" style="margin-top:10px;"><i class="fas fa-magic"></i> Auto-Fill Contoh (Admin)</button>`;
+        }
+        c.innerHTML = html;
+    }
+
+    function saveNilai(type, nisn, mapel, value) {
+        let dbNilai = type === 'HTS' ? dbNilaiHTS : dbNilaiHS;
+        if(!dbNilai[nisn]) dbNilai[nisn] = {};
+        dbNilai[nisn][mapel] = value === '' ? '-' : parseInt(value);
+        saveDB();
+    }
+
+    function autoNilai(type, mapel) {
+        if(!confirm('Isi otomatis nilai contoh?')) return;
+        let dbNilai = type === 'HTS' ? dbNilaiHTS : dbNilaiHS;
+        dbSiswa.forEach(s => {
+            if(!dbNilai[s.nisn]) dbNilai[s.nisn] = {};
+            dbNilai[s.nisn][mapel] = Math.floor(Math.random() * 20) + 80;
+        });
+        saveDB(); renderNilai(type, mapel);
+    }
+
+    function renderPengaturan() { document.getElementById('pengumuman-text').value = appSettings.pengumuman; }
+    function simpanPengumuman() { appSettings.pengumuman = document.getElementById('pengumuman-text').value; saveDB(); alert('Pengumuman disimpan!'); }
+
+    function exportExcel(name, tableId) {
+        const table = document.getElementById(tableId);
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.table_to_sheet(table);
+        XLSX.utils.book_append_sheet(wb, ws, name);
+        XLSX.writeFile(wb, name + ".xlsx");
+    }
+
+    function downloadBackup() {
+        const backup = { dbSiswa, dbUSPW, dbAbsenSiswa, dbAbsenGuru, dbGuru, dbNilaiHTS, dbNilaiHS, appSettings };
+        const blob = new Blob([JSON.stringify(backup)], {type: "application/json"});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "Backup_SMP_Karel.json"; a.click();
+    }
+
+    function importBackup(event) {
+        const file = event.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = JSON.parse(e.target.result);
+            if(data.dbSiswa) {
+                dbSiswa = data.dbSiswa; dbUSPW = data.dbUSPW; dbAbsenSiswa = data.dbAbsenSiswa;
+                dbAbsenGuru = data.dbAbsenGuru; dbGuru = data.dbGuru;
+                dbNilaiHTS = data.dbNilaiHTS; dbNilaiHS = data.dbNilaiHS; appSettings = data.appSettings;
+                saveDB(); alert('Import Berhasil!'); showPage('dashboard');
+            } else alert('Format file salah!');
+        };
+        reader.readAsText(file);
+    }
+
+    window.onload = initDB;
 </script>
 </body>
 </html>
